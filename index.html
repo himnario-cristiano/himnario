@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Himnario Cristiano</title>
-    <meta name="description" content="Himnario Cristiano con reproducción de audio, favoritos, búsqueda y PWA.">
+    <title>HIMNARIO CRISTIANO</title>
 
 <!-- Etiquetas PWA -->
     <link rel="manifest" href="manifest.json">
@@ -17,109 +16,743 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-:root{
-  --bg:#0b0c0f;--panel:#111318;--panel-2:#17191f;--line:#242832;--text:#f5f7fa;--muted:#9aa1ad;
-  --accent:#f1d18a;--accent-strong:#f6dc9c;--success:#25d366;--danger:#ff6b6b;--radius:16px;--text-scale:1;
-  color-scheme:dark;
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Montserrat,system-ui,sans-serif}
-html,body{width:100%;height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text);-webkit-tap-highlight-color:transparent}
-button,input,select{font:inherit}
-button{border:0}
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.player-container{width:100%;height:100dvh;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
-.now-playing{position:relative;flex:0 0 auto;padding:18px 22px 16px;background:linear-gradient(180deg,#101216 0%,#0d0f13 100%);border-bottom:1px solid var(--line)}
-.top-row{display:flex;align-items:center;gap:15px;min-width:0;padding-right:86px}
-.top-right-actions{position:absolute;top:14px;right:18px;display:flex;gap:4px;z-index:5}
-.btn-action,.btn,.fav-filter-btn,.action-btn,.btn-close-banner{display:inline-flex;align-items:center;justify-content:center;background:transparent;color:var(--muted);cursor:pointer;transition:.2s ease}
-.btn-action{width:38px;height:38px;border-radius:12px}
-.btn-action:hover,.btn:hover,.fav-filter-btn:hover,.action-btn:hover{color:var(--text);background:rgba(255,255,255,.06)}
-.btn-action svg,.action-btn svg,.fav-filter-btn svg{width:20px;height:20px;fill:currentColor}
-.font-size-panel{position:absolute;top:58px;right:18px;z-index:30;display:none;min-width:156px;padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(23,25,31,.98);box-shadow:0 18px 50px rgba(0,0,0,.45);backdrop-filter:blur(14px)}
-.font-size-panel.show{display:flex;flex-direction:column;gap:10px}
-.fs-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.fs-row button{width:36px;height:36px;border-radius:10px;background:#252932;color:var(--text);cursor:pointer}
-.fs-row button:hover{background:var(--accent);color:#111}
-#fsDisplay{min-width:50px;text-align:center;font-size:13px;font-weight:700}
-#fsReset{width:100%;padding:9px;border:1px solid var(--line);border-radius:10px;background:transparent;color:var(--muted);cursor:pointer}
-#fsReset:hover{color:var(--text);border-color:#3a404c}
-.vinyl-wrapper{position:relative;width:76px;height:76px;flex:0 0 76px;border-radius:50%;padding:3px;background:#08090b;box-shadow:0 5px 24px rgba(0,0,0,.4)}
-.vinyl-wrapper:after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;transform:translate(-50%,-50%);border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.2)}
-.cover-vinyl{display:block;width:100%;height:100%;border-radius:50%;object-fit:cover;animation:spin 5s linear infinite;animation-play-state:paused}
-@keyframes spin{to{transform:rotate(360deg)}}
-.info-current{min-width:0;flex:1}
-.title-current{font-size:calc(16px * var(--text-scale));font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.artist-current{margin-top:4px;font-size:calc(13px * var(--text-scale));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.progress-container{display:flex;align-items:center;gap:9px;margin:16px 0 12px;color:var(--muted);font-size:calc(11px * var(--text-scale));font-variant-numeric:tabular-nums}
-.progress-bar-bg{position:relative;flex:1;height:5px;border-radius:999px;background:#30343d;cursor:pointer;touch-action:none}
-.progress-bar-fill{width:0;height:100%;border-radius:inherit;background:var(--accent);transition:width .08s linear}
-.controls{display:flex;align-items:center;justify-content:center;gap:26px}
-.btn{width:38px;height:38px;border-radius:50%}
-.btn svg{width:21px;height:21px;fill:currentColor}
-.btn-play{width:46px;height:46px;background:var(--text);color:#0b0c0f;box-shadow:0 5px 20px rgba(0,0,0,.25)}
-.btn-play:hover{background:var(--accent-strong);color:#0b0c0f;transform:scale(1.04)}
-.btn-play svg{width:23px;height:23px}
-.playlist{min-height:0;flex:1;display:flex;flex-direction:column;background:#0e1014}
-.playlist-header{display:flex;align-items:center;gap:10px;padding:14px 20px 10px}
-.search-container{display:flex;align-items:center;gap:9px;min-width:0;flex:1;padding:9px 13px;border:1px solid transparent;border-radius:13px;background:var(--panel-2);transition:.2s}
-.search-container:focus-within{border-color:#3b414d;background:#1a1d23}
-.search-icon{width:18px;height:18px;flex:0 0 18px;fill:var(--muted)}
-.search-input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font-size:13px}
-.search-input::placeholder{color:#707783}
-.theme-select{max-width:170px;padding:9px 12px;border:1px solid transparent;border-radius:13px;background:var(--panel-2);color:var(--muted);outline:0;cursor:pointer;font-size:12px}
-.theme-select:hover,.theme-select:focus{border-color:#3b414d;color:var(--text)}
-.theme-select option{background:#17191f;color:var(--text)}
-.fav-filter-btn{width:40px;height:40px;border-radius:12px;flex:0 0 40px}
-.fav-filter-btn svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2}
-.fav-filter-btn.active{color:var(--accent);background:rgba(241,209,138,.08)}
-.fav-filter-btn.active svg{fill:var(--accent)}
-.playlist-items-container{width:100%;min-height:0;flex:1;overflow:auto;padding:2px 20px 18px;scrollbar-width:thin;scrollbar-color:#343943 transparent}
-.playlist-item{position:relative;display:flex;align-items:center;width:100%;min-height:62px;margin:3px 0;padding:8px 10px;border:1px solid transparent;border-radius:14px;cursor:pointer;transition:.18s ease}
-.playlist-item:hover{background:#171a20}
-.playlist-item.active{background:#181b21;border-color:#292e37}
-.playlist-item.active .song-title-list{color:var(--accent)}
-.playlist-item img{width:42px;height:42px;flex:0 0 42px;margin-right:12px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px #090a0c}
-.song-info-list{min-width:0;flex:1;display:flex;flex-direction:column}
-.song-title-list{font-size:calc(13px * var(--text-scale));font-weight:700;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.song-artist-list{margin-top:3px;font-size:calc(11px * var(--text-scale));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.song-actions-wrapper{display:flex;align-items:center}
-.action-btn{width:34px;height:34px;margin-left:3px;border-radius:10px}
-.action-btn svg{width:18px;height:18px}
-.fav-btn.active{color:var(--accent)}
-.fav-btn svg{fill:none;stroke:currentColor;stroke-width:2}
-.fav-btn.active svg{fill:var(--accent);stroke:var(--accent)}
-.more-options-btn{display:none!important}
-.modal-overlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.72);opacity:0;pointer-events:none;transition:opacity .2s;backdrop-filter:blur(6px)}
-.modal-overlay.show{opacity:1;pointer-events:auto}
-.modal-content{position:relative;width:min(420px,100%);max-height:82dvh;overflow:hidden;padding:26px 22px 22px;border:1px solid var(--line);border-radius:20px;background:#15171c;box-shadow:0 24px 80px rgba(0,0,0,.5);transform:translateY(12px) scale(.98);transition:.22s}
-.modal-overlay.show .modal-content{transform:none}
-.modal-close{position:absolute;top:10px;right:12px;width:36px;height:36px;border-radius:10px;background:transparent;color:var(--muted);font-size:26px;cursor:pointer}
-.modal-close:hover{background:rgba(255,255,255,.06);color:var(--text)}
-.modal-content h3{margin:0 34px 12px 0;color:var(--accent);font-size:18px}
-.modal-content p{margin-bottom:12px;color:var(--muted);font-size:13px;line-height:1.65}
-.ref-theme-badge{display:block;margin:0 auto 14px;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:#101216;color:var(--muted);font-size:12px;text-align:center}
-.ref-theme-badge span{color:var(--text);font-weight:700}
-#refModalBody{max-height:58dvh;overflow:auto;text-align:left}
-.ref-list{list-style:none}
-.ref-item{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;padding:11px 12px;border:1px solid var(--line);border-radius:12px;background:#1a1d23}
-.ref-hymnal{font-size:12px;font-weight:600;color:var(--text)}
-.ref-number{padding:4px 8px;border-radius:7px;background:var(--accent);color:#111;font-size:12px;font-weight:800}
-.whatsapp-btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;margin-top:14px;padding:12px 16px;border-radius:13px;background:var(--success);color:#07130b;font-weight:800;cursor:pointer;transition:.2s}
-.whatsapp-btn:hover{filter:brightness(1.05);transform:translateY(-1px)}
-.install-banner{position:fixed;left:14px;right:14px;bottom:14px;z-index:2000;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:rgba(21,23,28,.96);box-shadow:0 18px 50px rgba(0,0,0,.45);transform:translateY(calc(100% + 30px));transition:transform .3s;backdrop-filter:blur(12px)}
-.install-banner.show{transform:none}
-.install-banner-info,.install-banner-actions{display:flex;align-items:center;gap:10px}
-.install-banner-text{font-size:12px;font-weight:700}
-.btn-install{display:flex;align-items:center;gap:6px;padding:8px 13px;border-radius:10px;background:var(--accent);color:#111;font-size:12px;font-weight:800;cursor:pointer}
-.btn-install svg,.btn-close-banner svg{width:17px;height:17px;fill:currentColor}
-.btn-close-banner{width:32px;height:32px;border-radius:9px}
-::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#343943;border-radius:99px}::-webkit-scrollbar-thumb:hover{background:#4a505c}
-@media(max-width:640px){
-  .now-playing{padding:14px 14px 13px}.top-right-actions{top:10px;right:10px}.top-row{padding-right:78px}.vinyl-wrapper{width:64px;height:64px;flex-basis:64px}.controls{gap:22px}.playlist-header{padding:11px 10px 9px;flex-wrap:wrap}.search-container{flex:1 0 100%;order:1}.theme-select{order:2;max-width:none;flex:1}.fav-filter-btn{order:3}.playlist-items-container{padding:1px 9px 14px}.song-actions-wrapper{display:none;position:absolute;right:44px;top:50%;transform:translateY(-50%);padding:3px;border:1px solid var(--line);border-radius:13px;background:#17191f;box-shadow:0 12px 30px rgba(0,0,0,.45)}.song-actions-wrapper.show{display:flex;animation:menuIn .16s ease}.more-options-btn{display:inline-flex!important}.action-btn{width:32px;height:32px}.install-banner{left:8px;right:8px;bottom:8px}.btn-install span{display:none}}
-@keyframes menuIn{from{opacity:0;transform:translate(7px,-50%)}to{opacity:1;transform:translate(0,-50%)}}
-@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-</style>
+        :root {
+            --text-scale: 1; 
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+
+        body { 
+            background-color: #121212; 
+            width: 100vw; 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
+
+        .player-container { 
+            width: 100%; 
+            height: 100%; 
+            background: #121212; 
+            display: flex; 
+            flex-direction: column; 
+            color: #fff; 
+            overflow: hidden;
+        }
+
+        /* Reproductor Superior */
+        .now-playing { 
+            background: #121212; 
+            padding: 15px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            border-bottom: 1px solid #282828; 
+            position: relative; 
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+
+        .top-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        /* Contenedor de Botones Superior Derecho */
+        .top-right-actions {
+            position: absolute;
+            top: 1px; 
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .btn-action {
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease;
+        }
+        .btn-action svg { width: 24px; height: 24px; fill: currentColor; }
+        .btn-action:hover { color: #f7d694; }
+
+        .font-size-panel {
+            display: none;
+            position: absolute;
+            top: 45px; 
+            right: 20px;
+            background: #282828;
+            border: 1px solid #3e3e3e;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            z-index: 20;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 150px;
+        }
+        .font-size-panel.show { display: flex; }
+
+        .fs-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .fs-row button {
+            background: #4f4f4f;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            width: 34px;
+            height: 34px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .fs-row button:hover { background: #f7d694; color: #000; }
+
+        #fsDisplay {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        #fsReset {
+            background: transparent;
+            color: #b3b3b3;
+            border: 1px solid #4f4f4f;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        #fsReset:hover { background: #4f4f4f; color: #fff; }
+
+        /* Vinilo compacto arriba */
+        .vinyl-wrapper { 
+            position: relative; 
+            width: 80px; 
+            height: 80px; 
+            flex-shrink: 0;
+            border-radius: 50%;
+            box-shadow: 0 0 0 6px #0a0a0a, 0 6px 15px rgba(0,0,0,0.6); 
+        }
+
+        .vinyl-wrapper::after { 
+            content: ''; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 14px; 
+            height: 14px; 
+            background: #ffffff; 
+            border-radius: 50%; 
+            z-index: 2; 
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.8); 
+        }
+
+        .cover-vinyl { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            display: block;
+            animation: spin 4s linear infinite; 
+            animation-play-state: paused; 
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .info-current { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+            overflow: hidden;
+            flex: 1;
+            padding-right: 40px; 
+        }
+
+        .title-current { 
+            font-size: calc(16px * var(--text-scale)); 
+            font-weight: 700; 
+            color: #fff;
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            margin-bottom: 2px;
+            transition: font-size 0.2s;
+        }
+
+        .artist-current { 
+            font-size: calc(13px * var(--text-scale)); 
+            color: #b3b3b3; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            transition: font-size 0.2s;
+        }
+
+        .progress-container { 
+            width: 100%; 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 12px; 
+            font-size: calc(11px * var(--text-scale)); 
+            color: #b3b3b3; 
+            transition: font-size 0.2s;
+        }
+
+        .progress-bar-bg { 
+            flex: 1; 
+            height: 4px; 
+            background: #4f4f4f; 
+            border-radius: 5px; 
+            margin: 0 10px; 
+            cursor: pointer; 
+            position: relative; 
+        }
+
+        .progress-bar-fill { 
+            height: 100%; 
+            background: #f7d694; 
+            border-radius: 5px; 
+            width: 0%; 
+            transition: width 0.1s linear, background 0.2s; 
+        }
+
+        .controls { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 25px; 
+        }
+
+        .btn { 
+            background: none; 
+            border: none; 
+            color: #b3b3b3; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: color 0.2s, transform 0.2s; 
+        }
+
+        .btn:hover { color: #f7d694; }
+        .btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+        .btn-play { 
+            background: #fff; 
+            color: #000; 
+            border-radius: 50%; 
+            width: 44px; 
+            height: 44px; 
+            transition: all 0.3s ease; 
+        }
+
+        .btn-play:hover { 
+            transform: scale(1.05); 
+            color: #000; 
+            background: #f7d694; 
+        }
+
+        .btn-play svg { width: 22px; height: 22px; }
+
+        /* Contenedor Principal de la Lista de reproducción */
+        .playlist { 
+            flex: 1; 
+            background: #181818; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            overflow: hidden; 
+        }
+
+        /* Header de la lista */
+        .playlist-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px 10px 20px;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: #282828;
+            border-radius: 20px;
+            padding: 8px 15px;
+            flex: 1;
+            border: 1px solid transparent;
+            transition: border-color 0.3s, background 0.3s;
+        }
+
+        .search-container:focus-within {
+            border-color: #f7d694;
+            background: #2a2a2a;
+        }
+
+        .search-icon {
+            width: 18px;
+            height: 18px;
+            fill: #b3b3b3;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .search-input::placeholder { color: #888; }
+
+        /* Select de Temas */
+        .theme-select {
+            background: #282828;
+            color: #b3b3b3;
+            border: 1px solid transparent;
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.3s, color 0.3s, background 0.3s;
+            font-family: 'Montserrat', sans-serif;
+            flex-shrink: 0;
+            max-width: 150px;
+        }
+        .theme-select:focus, .theme-select:hover {
+            border-color: #f7d694;
+            color: #fff;
+            background: #2a2a2a;
+        }
+        .theme-select option {
+            background: #282828;
+            color: #fff;
+        }
+
+        .fav-filter-btn {
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
+
+        .fav-filter-btn svg { width: 28px; height: 28px; transition: all 0.3s ease; }
+        .fav-filter-btn:hover { color: #fff; }
+        .fav-filter-btn.active { color: #f7d694; }
+        .fav-filter-btn.active svg { fill: #f7d694; }
+
+        /* Contenedor de los items */
+        .playlist-items-container {
+            width: 100%;
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 15px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .playlist-item { 
+            position: relative;
+            width: 100%; 
+            display: flex; 
+            align-items: center; 
+            padding: 10px 14px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: background 0.3s; 
+            margin-bottom: 6px; 
+        }
+        
+        .playlist-item:hover { background: #282828; }
+        .playlist-item.active { background: #2a2a2a; }
+        .playlist-item.active .song-title-list { color: #f7d694; }
+
+        .playlist-item img { 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 50%; 
+            margin-right: 12px; 
+            object-fit: cover; 
+            box-shadow: 0 0 0 2px #0a0a0a; 
+            flex-shrink: 0;
+        }
+        
+        .song-info-list { 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .song-title-list { 
+            font-size: calc(14px * var(--text-scale)); 
+            font-weight: 600; 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: font-size 0.2s;
+        }
+        
+        .song-artist-list { 
+            font-size: calc(12px * var(--text-scale)); 
+            color: #b3b3b3; 
+            margin-top: 2px; 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: font-size 0.2s;
+        }
+
+        /* Envoltorio de las acciones del track */
+        .song-actions-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Botones de acción base */
+        .action-btn {
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s, color 0.2s;
+            margin-left: 5px;
+            flex-shrink: 0;
+        }
+
+        .action-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .action-btn svg { width: 20px; height: 20px; fill: currentColor; }
+
+        button.action-btn.more-options-btn {
+            display: none;
+            margin-left: 5px;
+        }
+
+        .fav-btn.active { color: #f7d694; }
+        .fav-btn.active svg { fill: #f7d694; stroke: #f7d694; }
+        .fav-btn svg { stroke: currentColor; stroke-width: 2; fill: none; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4f4f4f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f7d694; }
+
+        /* Estilos del Modal Base */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: #282828;
+            padding: 30px 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            color: #fff;
+            border: 1px solid #3e3e3e;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 2;
+        }
+        .modal-close:hover { color: #f7d694; }
+        
+        .modal-content h3 {
+            margin-bottom: 10px;
+            color: #f7d694;
+            font-size: 18px;
+            padding-right: 20px;
+        }
+        .modal-content p {
+            font-size: 14px;
+            color: #b3b3b3;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        /* Estilos específicos para el Modal de Referencias y Tema */
+        .ref-theme-badge {
+            font-size: 13px;
+            color: #b3b3b3;
+            margin: 0 auto 15px auto;
+            text-align: center;
+            background: #1e1e1e;
+            padding: 6px 14px;
+            border-radius: 15px;
+            border: 1px solid #3e3e3e;
+            display: inline-block;
+        }
+        .ref-theme-badge span {
+            color: #fff;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        #refModalBody {
+            overflow-y: auto;
+            text-align: left;
+            margin-top: 5px;
+        }
+        .ref-list {
+            list-style: none;
+            padding: 0;
+        }
+        .ref-item {
+            background: #333;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #f7d694;
+        }
+        .ref-hymnal {
+            font-weight: 600;
+            font-size: 13px;
+            color: #fff;
+        }
+        .ref-number {
+            font-weight: bold;
+            color: #000;
+            background: #f7d694;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background 0.2s, transform 0.2s;
+            width: 100%;
+            font-family: inherit;
+        }
+        .whatsapp-btn:hover {
+            background: #1ebe57;
+            transform: scale(1.02);
+        }
+
+        /* --- RESPONSIVE: COMPORTAMIENTO MÓVIL --- */
+        @media (max-width: 480px) {
+            .vinyl-wrapper { width: 65px; height: 65px; }
+            .title-current { font-size: calc(15px * var(--text-scale)); }
+            
+            /* Ajustes del Header de Playlist en Móvil */
+            .playlist-header { 
+                padding: 15px 10px 10px 10px; 
+                flex-wrap: wrap; 
+            }
+            .search-container {
+                width: 100%;
+                flex: 0 0 100%; 
+                margin-bottom: 8px;
+                order: 1;
+            }
+            .theme-select {
+                flex: 1; 
+                order: 2;
+                max-width: none;
+            }
+            .fav-filter-btn {
+                order: 3;
+            }
+
+            .playlist-items-container { padding: 0 10px 10px 10px; }
+            
+            .top-right-actions { top: 5px; right: 10px; } 
+            .font-size-panel { right: 10px; top: 40px; } 
+
+            .action-btn svg { width: 18px; height: 18px; }
+            
+            /* Ocultamos los botones y mostramos los 3 puntos */
+            button.action-btn.more-options-btn {
+                display: flex; 
+            }
+            .song-actions-wrapper {
+                display: none;
+                position: absolute;
+                right: 40px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #282828;
+                padding: 4px;
+                border-radius: 20px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+                border: 1px solid #3e3e3e;
+                z-index: 100;
+            }
+            
+            .song-actions-wrapper.show {
+                display: flex;
+                flex-direction: row;
+                gap: 2px;
+                animation: slideInRight 0.2s ease;
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translate(10px, -50%); }
+            to { opacity: 1; transform: translate(0, -50%); }
+        }
+
+		/* --- BANNER DE INSTALACIÓN PWA --- */
+        .install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1e1e1e;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.6);
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            border-top: 1px solid #3e3e3e;
+        }
+        .install-banner.show {
+            transform: translateY(0);
+        }
+        .install-banner-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .install-banner-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .install-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn-install {
+            background: #f7d694;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .btn-install:hover { background: #e5c483; transform: scale(1.05); }
+        .btn-install svg { width: 18px; height: 18px; fill: currentColor; }
+        
+        .btn-close-banner {
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            transition: color 0.2s;
+        }
+        .btn-close-banner:hover { color: #fff; }
+        .btn-close-banner svg { width: 22px; height: 22px; fill: currentColor; }
+
+        @media (max-width: 480px) {
+            .btn-install span { 
+                display: none; 
+            }
+            .install-banner-text {
+                font-size: 13px;
+            }
+        }
+    </style>
 </head>
 <body>
 <!-- Banner de Instalación -->
@@ -140,6 +773,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
                 </button>
             </div>
         </div>
+    </div> <!-- Cierre de player-container -->
     <audio id="mainAudioPlayer" preload="auto" playsinline controls style="display: none;"></audio>
 
     <div class="player-container">
@@ -261,287 +895,658 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
     <script src="songs.js"></script>
 	
     <script>
-(() => {
-  'use strict';
+        const globalCoverUrl = "https://i.postimg.cc/14xJ49F9/LOGO-Himnario-Cristiano.png";
 
-  const $ = id => document.getElementById(id);
-  const songsData = Array.isArray(window.songs) ? window.songs : (typeof songs !== 'undefined' && Array.isArray(songs) ? songs : []);
-  const songs = songsData;
-  const COVER = 'https://i.postimg.cc/14xJ49F9/LOGO-Himnario-Cristiano.png';
-  const WA = '51935180887';
+        let songIndex = 0;
+        const audio = document.getElementById("mainAudioPlayer");
+        let isPlaying = false;
+        let showOnlyFavorites = false; 
 
-  const el = {
-    audio: $('mainAudioPlayer'), cover: $('cover'), title: $('title'), artist: $('artist'), play: $('playBtn'), playIcon: $('playIcon'),
-    prev: $('prevBtn'), next: $('nextBtn'), progress: $('progressBar'), progressArea: $('progressArea'), current: $('currTime'), total: $('totalTime'),
-    playlist: $('playlistItems'), search: $('searchInput'), favFilter: $('favFilterBtn'), theme: $('themeFilter'),
-    help: $('helpBtn'), helpModal: $('helpModal'), closeHelp: $('closeModalBtn'), whatsapp: $('btnWhatsappContact'),
-    refModal: $('refModal'), closeRef: $('closeRefModalBtn'), refTitle: $('refModalTitle'), refBody: $('refModalBody'),
-    textBtn: $('textSizeBtn'), textPanel: $('textSizePanel'), decrease: $('fsDecrease'), increase: $('fsIncrease'), display: $('fsDisplay'), reset: $('fsReset'),
-    installBanner: $('installBanner'), install: $('btnInstallApp'), closeInstall: $('btnCloseBanner')
-  };
+        const playlistEl = document.getElementById("playlistItems");
+        const coverEl = document.getElementById("cover");
+        const titleEl = document.getElementById("title");
+        const artistEl = document.getElementById("artist");
+        const playBtn = document.getElementById("playBtn");
+        const playIcon = document.getElementById("playIcon");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const progressBar = document.getElementById("progressBar");
+        const progressArea = document.getElementById("progressArea");
+        const currTimeEl = document.getElementById("currTime");
+        const totalTimeEl = document.getElementById("totalTime");
+        const searchInput = document.getElementById("searchInput");
+        const favFilterBtn = document.getElementById("favFilterBtn");
+        const themeFilter = document.getElementById("themeFilter");
 
-  if (!el.audio || !el.play || !el.playlist || !songs.length) {
-    console.error('Himnario: no se encontró el reproductor o songs.js está vacío.');
-    return;
-  }
+        // --- INICIALIZAR SELECT DE TEMAS MÚLTIPLES ---
+        function initThemeFilter() {
+            let allThemes = [];
+            // Extraer todos los temas de todas las canciones
+            songs.forEach(song => {
+                if (song.temas && Array.isArray(song.temas)) {
+                    allThemes = allThemes.concat(song.temas);
+                }
+            });
+            
+            // Eliminar duplicados y ordenar
+            const uniqueThemes = [...new Set(allThemes)].sort();
+            
+            uniqueThemes.forEach(tema => {
+                const option = document.createElement("option");
+                option.value = tema;
+                option.textContent = tema;
+                themeFilter.appendChild(option);
+            });
+        }
 
-  let songIndex = Math.min(Number(localStorage.getItem('hymn_last_index')) || 0, songs.length - 1);
-  let isPlaying = false;
-  let showOnlyFavorites = false;
-  let intentionalPause = false;
-  let currentTextScale = Number(localStorage.getItem('hymn_text_scale')) || 100;
-  let deferredPrompt = null;
+        // --- Cierre global de menús y paneles ---
+        document.addEventListener('click', (e) => {
+            if (!textSizePanel.contains(e.target) && !textSizeBtn.contains(e.target)) {
+                textSizePanel.classList.remove('show');
+            }
+            
+            if (!e.target.closest('.song-actions-wrapper') && !e.target.closest('.more-options-btn')) {
+                document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
+                    el.classList.remove('show');
+                });
+            }
+        });
 
-  const icon = {
-    play: '<path d="M8 5v14l11-7z"/>', pause: '<path d="M6 19h4V5H6v14zm8-14h4v14h-4V5z"/>',
-    download: '<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>',
-    book: '<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>',
-    dots: '<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>'
-  };
+        // --- Lógica del Botón de Ayuda / Soporte (MODAL) ---
+        const helpBtn = document.getElementById('helpBtn');
+        const helpModal = document.getElementById('helpModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
 
-  const safe = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-  const favoriteKey = song => 'fav_' + song.src;
-  const downloadKey = song => 'downloaded_' + song.src;
-  const isFavorite = song => localStorage.getItem(favoriteKey(song)) === 'true';
+        helpBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            helpModal.classList.add('show');
+        });
 
-  function formatStreamUrl(url) {
-    if (!url || !url.includes('dropbox.com')) return url || '';
-    return url.replace('www.dropbox.com', 'dl.dropboxusercontent.com').replace(/[?&]dl=[01]/, '');
-  }
+        closeModalBtn.addEventListener('click', () => {
+            helpModal.classList.remove('show');
+        });
 
-  function formatDownloadUrl(url) {
-    if (!url || !url.includes('dropbox.com')) return url || '';
-    const clean = url.replace(/[?&]dl=[01]/, '');
-    return clean + (clean.includes('?') ? '&dl=1' : '?dl=1');
-  }
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                helpModal.classList.remove('show');
+            }
+        });
 
-  function timeText(seconds) {
-    if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
-    const m = Math.floor(seconds / 60), s = Math.floor(seconds % 60);
-    return `${m}:${String(s).padStart(2, '0')}`;
-  }
+        // --- LÓGICA DEL MODAL DE REFERENCIAS (MÚLTIPLES TEMAS) ---
+        const refModal = document.getElementById('refModal');
+        const closeRefModalBtn = document.getElementById('closeRefModalBtn');
+        const refModalTitle = document.getElementById('refModalTitle');
+        const refModalBody = document.getElementById('refModalBody');
 
-  function setPlayingUI(playing) {
-    isPlaying = !!playing;
-    el.playIcon.innerHTML = isPlaying ? icon.pause : icon.play;
-    el.cover.style.animationPlayState = isPlaying ? 'running' : 'paused';
-    if ('mediaSession' in navigator) navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-  }
+        window.openRefModal = function(event, index) {
+            event.stopPropagation();
+            
+            document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
+                el.classList.remove('show');
+            });
 
-  function setMediaAction(action, handler) {
-    if (!('mediaSession' in navigator)) return;
-    try { navigator.mediaSession.setActionHandler(action, handler); } catch (_) {}
-  }
+            const song = songs[index];
+            refModalTitle.innerText = song.title;
+            
+            let html = '';
 
-  function updateMediaSession(song) {
-    if (!('mediaSession' in navigator) || !song) return;
-    try {
-      navigator.mediaSession.metadata = new MediaMetadata({
-        title: song.title || 'Himno', artist: song.artist || 'Himnario Cristiano', album: 'Himnario Cristiano',
-        artwork: [{ src: COVER, sizes: '512x512', type: 'image/png' }]
-      });
-    } catch (_) {}
-    setMediaAction('play', playSong); setMediaAction('pause', pauseSong); setMediaAction('previoustrack', prevSong); setMediaAction('nexttrack', nextSong);
-    setMediaAction('seekbackward', () => seekBy(-10)); setMediaAction('seekforward', () => seekBy(10));
-  }
+            // Muestra los temas separados por coma
+            if (song.temas && song.temas.length > 0) {
+                html += `<div class="ref-theme-badge">Tema(s): <span>${song.temas.join(", ")}</span></div>`;
+            }
 
-  function loadSong(song, autoplay = false) {
-    if (!song) return;
-    intentionalPause = !autoplay;
-    el.audio.pause();
-    el.audio.src = formatStreamUrl(song.src);
-    el.audio.load();
-    el.title.textContent = song.title || 'Sin título';
-    el.artist.textContent = song.artist || '';
-    el.cover.src = COVER;
-    el.progress.style.width = '0%'; el.current.textContent = '0:00'; el.total.textContent = '0:00';
-    localStorage.setItem('hymn_last_index', String(songIndex));
-    updateMediaSession(song);
-    renderPlaylist();
-    setPlayingUI(false);
-    if (autoplay) playSong();
-  }
+            if (song.references && song.references.length > 0) {
+                html += '<ul class="ref-list">';
+                song.references.forEach(ref => {
+                    html += `
+                        <li class="ref-item">
+                            <span class="ref-hymnal">${ref.hymnal}</span>
+                            <span class="ref-number">#${ref.number}</span>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+            } else {
+                html += '<p style="text-align:center; padding: 20px 0; color: #b3b3b3;">No hay referencias a otros himnarios para esta canción.</p>';
+            }
 
-  async function playSong() {
-    intentionalPause = false;
-    try {
-      await el.audio.play();
-      setPlayingUI(true);
-    } catch (error) {
-      setPlayingUI(false);
-      console.debug('Himnario: reproducción no iniciada automáticamente.', error);
-    }
-  }
+            refModalBody.innerHTML = html;
+            refModal.classList.add('show');
+        };
 
-  function pauseSong() {
-    intentionalPause = true;
-    el.audio.pause();
-    setPlayingUI(false);
-  }
+        closeRefModalBtn.addEventListener('click', () => {
+            refModal.classList.remove('show');
+        });
 
-  function selectSong(index) {
-    if (!songs[index]) return;
-    songIndex = index;
-    loadSong(songs[songIndex], true);
-  }
-  window.selectSong = selectSong;
+        refModal.addEventListener('click', (e) => {
+            if (e.target === refModal) {
+                refModal.classList.remove('show');
+            }
+        });
 
-  function filteredIndices() {
-    const q = (el.search.value || '').trim().toLowerCase();
-    const theme = el.theme.value;
-    return songs.reduce((out, song, i) => {
-      const title = String(song.title || '').toLowerCase(), artist = String(song.artist || '').toLowerCase();
-      const matchSearch = !q || title.includes(q) || artist.includes(q);
-      const matchTheme = theme === 'all' || (Array.isArray(song.temas) && song.temas.includes(theme));
-      if (matchSearch && matchTheme && (!showOnlyFavorites || isFavorite(song))) out.push(i);
-      return out;
-    }, []);
-  }
+        // --- LÓGICA DEL BOTÓN WHATSAPP DINÁMICO ---
+        const btnWhatsappContact = document.getElementById('btnWhatsappContact');
+        
+        btnWhatsappContact.addEventListener('click', () => {
+            let contactoWhatsapp = "51935180887"; 
+            contactoWhatsapp = contactoWhatsapp.replace('@', '');
 
-  function nextSong() {
-    const list = filteredIndices(); if (!list.length) return;
-    const pos = list.indexOf(songIndex); songIndex = list[(pos < 0 ? 0 : (pos + 1) % list.length)];
-    loadSong(songs[songIndex], true);
-  }
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            let whatsappUrl = "";
 
-  function prevSong() {
-    const list = filteredIndices(); if (!list.length) return;
-    const pos = list.indexOf(songIndex); songIndex = list[(pos < 0 ? 0 : (pos - 1 + list.length) % list.length)];
-    loadSong(songs[songIndex], isPlaying);
-  }
+            if (isMobile) {
+                whatsappUrl = `https://api.whatsapp.com/send?phone=${contactoWhatsapp}`;
+            } else {
+                whatsappUrl = `https://web.whatsapp.com/send?phone=${contactoWhatsapp}`;
+            }
+            
+            window.open(whatsappUrl, '_blank');
+        });
 
-  function seekBy(seconds) {
-    if (!Number.isFinite(el.audio.duration)) return;
-    el.audio.currentTime = Math.max(0, Math.min(el.audio.duration, el.audio.currentTime + seconds));
-  }
+        // --- Lógica del tamaño de texto ---
+        const textSizeBtn = document.getElementById('textSizeBtn');
+        const textSizePanel = document.getElementById('textSizePanel');
+        const fsDecrease = document.getElementById('fsDecrease');
+        const fsIncrease = document.getElementById('fsIncrease');
+        const fsDisplay = document.getElementById('fsDisplay');
+        const fsReset = document.getElementById('fsReset');
+        let currentTextScale = 100;
 
-  function seekAt(clientX) {
-    const rect = el.progressArea.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    if (Number.isFinite(el.audio.duration)) el.audio.currentTime = ratio * el.audio.duration;
-  }
+        textSizeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            textSizePanel.classList.toggle('show');
+        });
 
-  function renderPlaylist() {
-    const indices = filteredIndices();
-    el.playlist.replaceChildren();
-    indices.forEach(index => {
-      const song = songs[index], fav = isFavorite(song), downloaded = localStorage.getItem(downloadKey(song)) === 'true';
-      const item = document.createElement('div');
-      item.className = `playlist-item${index === songIndex ? ' active' : ''}`;
-      item.innerHTML = `
-        <img src="${COVER}" alt="" loading="lazy">
-        <div class="song-info-list" onclick="selectSong(${index})">
-          <span class="song-title-list">${safe(song.title)}</span><span class="song-artist-list">${safe(song.artist)}</span>
-        </div>
-        <div class="song-actions-wrapper" id="actions-${index}">
-          <button class="action-btn" onclick="openRefModal(event,${index})" title="Ver referencias">${icon.book}</button>
-          <button class="action-btn fav-btn${fav ? ' active' : ''}" onclick="toggleFav(event,${index})" title="Favorito"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg></button>
-          ${downloaded ? '' : `<button class="action-btn" onclick="downloadSongFile(event,${index})" title="Descargar">${icon.download}</button>`}
-        </div>
-        <button class="action-btn more-options-btn" onclick="toggleOptionsMenu(event,${index})" title="Opciones">${icon.dots}</button>`;
-      el.playlist.appendChild(item);
-    });
-  }
+        function applyTextScale() {
+            document.documentElement.style.setProperty('--text-scale', currentTextScale / 100);
+            fsDisplay.innerText = `${currentTextScale}%`;
+        }
 
-  window.toggleFav = (event, index) => {
-    event.stopPropagation(); const song = songs[index]; const key = favoriteKey(song);
-    localStorage.getItem(key) === 'true' ? localStorage.removeItem(key) : localStorage.setItem(key, 'true'); renderPlaylist();
-  };
+        fsDecrease.addEventListener('click', () => {
+            if (currentTextScale > 60) {
+                currentTextScale -= 10;
+                applyTextScale();
+            }
+        });
 
-  window.toggleOptionsMenu = (event, index) => {
-    event.stopPropagation();
-    document.querySelectorAll('.song-actions-wrapper.show').forEach(node => { if (node.id !== `actions-${index}`) node.classList.remove('show'); });
-    document.getElementById(`actions-${index}`)?.classList.toggle('show');
-  };
+        fsIncrease.addEventListener('click', () => {
+            if (currentTextScale < 180) {
+                currentTextScale += 10;
+                applyTextScale();
+            }
+        });
 
-  window.downloadSongFile = (event, index) => {
-    event.stopPropagation(); const song = songs[index]; const a = document.createElement('a');
-    a.href = formatDownloadUrl(song.src); a.download = `${song.title || 'himno'}.mp3`; a.target = '_blank'; a.rel = 'noopener';
-    document.body.appendChild(a); a.click(); a.remove(); localStorage.setItem(downloadKey(song), 'true'); renderPlaylist();
-  };
+        fsReset.addEventListener('click', () => {
+            currentTextScale = 100;
+            applyTextScale();
+        });
 
-  window.openRefModal = (event, index) => {
-    event.stopPropagation(); document.querySelectorAll('.song-actions-wrapper.show').forEach(n => n.classList.remove('show'));
-    const song = songs[index]; el.refTitle.textContent = song.title || 'Referencias';
-    let html = '';
-    if (Array.isArray(song.temas) && song.temas.length) html += `<div class="ref-theme-badge">Tema(s): <span>${safe(song.temas.join(', '))}</span></div>`;
-    if (Array.isArray(song.references) && song.references.length) {
-      html += '<ul class="ref-list">' + song.references.map(ref => `<li class="ref-item"><span class="ref-hymnal">${safe(ref.hymnal)}</span><span class="ref-number">#${safe(ref.number)}</span></li>`).join('') + '</ul>';
-    } else html += '<p style="text-align:center;padding:18px 0">No hay referencias a otros himnarios para esta canción.</p>';
-    el.refBody.innerHTML = html; el.refModal.classList.add('show');
-  };
+        coverEl.src = globalCoverUrl;
+        const iconPlay = `<path d="M8 5v14l11-7z"/>`;
+        const iconPause = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+        
+        // Íconos SVG
+        const iconDownloadSvg = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+        const iconBookSvg = `<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>`;
+        const iconDotsSvg = `<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
 
-  function closeModal(modal) { modal?.classList.remove('show'); }
+        function formatDropboxStreamUrl(url) {
+            if(url.includes("dropbox.com")) {
+                return url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "").replace("?dl=1", "");
+            }
+            return url; 
+        }
 
-  function initThemeFilter() {
-    const themes = [...new Set(songs.flatMap(s => Array.isArray(s.temas) ? s.temas : []))].filter(Boolean).sort((a,b) => String(a).localeCompare(String(b), 'es'));
-    const fragment = document.createDocumentFragment();
-    themes.forEach(theme => { const option = document.createElement('option'); option.value = theme; option.textContent = theme; fragment.appendChild(option); });
-    el.theme.appendChild(fragment);
-  }
+        function formatDropboxDownloadUrl(url) {
+            if(url.includes("dropbox.com")) {
+                let cleanUrl = url.replace("?dl=0", "").replace("?dl=1", "");
+                return cleanUrl + (cleanUrl.includes("?") ? "&dl=1" : "?dl=1");
+            }
+            return url;
+        }
 
-  function applyTextScale() {
-    document.documentElement.style.setProperty('--text-scale', currentTextScale / 100);
-    el.display.textContent = `${currentTextScale}%`;
-    localStorage.setItem('hymn_text_scale', String(currentTextScale));
-  }
+        window.downloadSongFile = function(event, index) {
+            event.stopPropagation();
+            const song = songs[index];
+            const downloadUrl = formatDropboxDownloadUrl(song.src);
 
-  el.play.addEventListener('click', () => isPlaying ? pauseSong() : playSong());
-  el.prev.addEventListener('click', prevSong); el.next.addEventListener('click', nextSong); el.audio.addEventListener('ended', nextSong);
-  el.audio.addEventListener('playing', () => setPlayingUI(true));
-  el.audio.addEventListener('pause', () => { if (intentionalPause || !el.audio.ended) setPlayingUI(false); });
-  el.audio.addEventListener('waiting', () => { if (isPlaying && 'mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing'; });
-  el.audio.addEventListener('stalled', () => { if (isPlaying && 'mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing'; });
-  el.audio.addEventListener('timeupdate', () => {
-    const duration = el.audio.duration, current = el.audio.currentTime;
-    if (!Number.isFinite(duration) || duration <= 0) return;
-    el.progress.style.width = `${Math.min(100, current / duration * 100)}%`; el.current.textContent = timeText(current); el.total.textContent = timeText(duration);
-  });
-  el.audio.addEventListener('loadedmetadata', () => { if (Number.isFinite(el.audio.duration)) el.total.textContent = timeText(el.audio.duration); });
-  el.audio.addEventListener('error', () => { if (isPlaying) setPlayingUI(false); });
-  el.progressArea.addEventListener('pointerdown', e => seekAt(e.clientX));
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.setAttribute('download', `${song.title}.mp3`);
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
 
-  el.favFilter.addEventListener('click', () => { showOnlyFavorites = !showOnlyFavorites; el.favFilter.classList.toggle('active', showOnlyFavorites); renderPlaylist(); });
-  el.search.addEventListener('input', renderPlaylist); el.theme.addEventListener('change', renderPlaylist);
-  el.textBtn.addEventListener('click', e => { e.stopPropagation(); el.textPanel.classList.toggle('show'); });
-  el.decrease.addEventListener('click', () => { currentTextScale = Math.max(60, currentTextScale - 10); applyTextScale(); });
-  el.increase.addEventListener('click', () => { currentTextScale = Math.min(180, currentTextScale + 10); applyTextScale(); });
-  el.reset.addEventListener('click', () => { currentTextScale = 100; applyTextScale(); });
+            localStorage.setItem('downloaded_' + song.src, 'true');
+            renderPlaylist(); 
+        }
 
-  el.help.addEventListener('click', e => { e.stopPropagation(); el.helpModal.classList.add('show'); });
-  el.closeHelp.addEventListener('click', () => closeModal(el.helpModal));
-  el.helpModal.addEventListener('click', e => { if (e.target === el.helpModal) closeModal(el.helpModal); });
-  el.closeRef.addEventListener('click', () => closeModal(el.refModal));
-  el.refModal.addEventListener('click', e => { if (e.target === el.refModal) closeModal(el.refModal); });
-  el.whatsapp.addEventListener('click', () => {
-    const mobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
-    window.open(`${mobile ? 'https://api.whatsapp.com/send?phone=' : 'https://web.whatsapp.com/send?phone='}${WA}`, '_blank', 'noopener');
-  });
+        // --- LÓGICA DE FAVORITOS Y BÚSQUEDA ---
+        window.toggleFav = function(event, index) {
+            event.stopPropagation(); 
+            const song = songs[index];
+            const key = 'fav_' + song.src;
+            
+            if (localStorage.getItem(key) === 'true') {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, 'true');
+            }
+            renderPlaylist(); 
+        }
 
-  document.addEventListener('click', e => {
-    if (!el.textPanel.contains(e.target) && !el.textBtn.contains(e.target)) el.textPanel.classList.remove('show');
-    if (!e.target.closest('.song-actions-wrapper') && !e.target.closest('.more-options-btn')) document.querySelectorAll('.song-actions-wrapper.show').forEach(n => n.classList.remove('show'));
-  });
+        favFilterBtn.addEventListener('click', () => {
+            showOnlyFavorites = !showOnlyFavorites;
+            if (showOnlyFavorites) {
+                favFilterBtn.classList.add('active');
+            } else {
+                favFilterBtn.classList.remove('active');
+            }
+            renderPlaylist();
+        });
 
-  document.addEventListener('keydown', e => {
-    if (e.target.matches('input,select,textarea')) return;
-    if (e.code === 'Space') { e.preventDefault(); isPlaying ? pauseSong() : playSong(); }
-    if (e.code === 'ArrowRight') seekBy(5); if (e.code === 'ArrowLeft') seekBy(-5);
-  });
+        searchInput.addEventListener("input", () => {
+            renderPlaylist();
+        });
 
-  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; el.installBanner.classList.add('show'); });
-  el.install.addEventListener('click', async () => {
-    if (!deferredPrompt) return; el.installBanner.classList.remove('show'); deferredPrompt.prompt();
-    try { await deferredPrompt.userChoice; } catch (_) {} deferredPrompt = null;
-  });
-  el.closeInstall.addEventListener('click', () => el.installBanner.classList.remove('show'));
-  window.addEventListener('appinstalled', () => { el.installBanner.classList.remove('show'); deferredPrompt = null; });
+        themeFilter.addEventListener("change", () => {
+            renderPlaylist();
+        });
 
-  if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.warn('Service Worker:', err)));
+        function getFilteredIndices() {
+            const query = searchInput.value.toLowerCase();
+            const selectedTheme = themeFilter.value;
+            let indices = [];
+            
+            songs.forEach((song, i) => {
+                const matchSearch = song.title.toLowerCase().includes(query) || song.artist.toLowerCase().includes(query);
+                
+                // Comprueba si el tema seleccionado está dentro del arreglo de temas de la canción
+                const matchTheme = selectedTheme === 'all' || (song.temas && song.temas.includes(selectedTheme));
+                
+                const isFav = localStorage.getItem('fav_' + song.src) === 'true';
 
-  // Inicialización
-  el.cover.src = COVER; initThemeFilter(); applyTextScale(); loadSong(songs[songIndex], false);
-})();
-</script>
+                if (matchSearch && matchTheme) {
+                    if (!showOnlyFavorites || (showOnlyFavorites && isFav)) {
+                        indices.push(i);
+                    }
+                }
+            });
+            return indices;
+        }
+
+        // Activa/Desactiva el submenú en móviles
+        window.toggleOptionsMenu = function(event, index) {
+            event.stopPropagation();
+            document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
+                if (el.id !== `actions-${index}`) {
+                    el.classList.remove('show');
+                }
+            });
+            const wrapper = document.getElementById(`actions-${index}`);
+            wrapper.classList.toggle('show');
+        }
+
+        function renderPlaylist() {
+            playlistEl.innerHTML = "";
+            const filteredIndices = getFilteredIndices();
+
+            filteredIndices.forEach((index) => {
+                const song = songs[index];
+                const item = document.createElement("div");
+                item.className = `playlist-item ${index === songIndex ? "active" : ""}`;
+
+                const isDownloaded = localStorage.getItem('downloaded_' + song.src) === 'true';
+                const isFav = localStorage.getItem('fav_' + song.src) === 'true';
+
+                const refButtonHtml = `
+                    <button class="action-btn" onclick="openRefModal(event, ${index})" title="Ver en otros Himnarios">
+                        ${iconBookSvg}
+                    </button>
+                `;
+
+                const favButtonHtml = `
+                    <button class="action-btn fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${index})" title="Marcar como favorito">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    </button>
+                `;
+
+                const downloadButtonHtml = isDownloaded ? '' : `
+                    <button class="action-btn" onclick="downloadSongFile(event, ${index})" title="Descargar MP3">
+                        ${iconDownloadSvg}
+                    </button>
+                `;
+
+                item.innerHTML = `
+                    <img src="${globalCoverUrl}" alt="cover">
+                    <div class="song-info-list" onclick="selectSong(${index})">
+                        <span class="song-title-list">${song.title}</span>
+                        <span class="song-artist-list">${song.artist}</span>
+                    </div>
+                    
+                    <div class="song-actions-wrapper" id="actions-${index}">
+                        ${refButtonHtml}
+                        ${favButtonHtml}
+                        ${downloadButtonHtml}
+                    </div>
+                    
+                    <button class="action-btn more-options-btn" onclick="toggleOptionsMenu(event, ${index})" title="Opciones">
+                        ${iconDotsSvg}
+                    </button>
+                `;
+                playlistEl.appendChild(item);
+            });
+        }
+
+        // --- REPRODUCTOR ROBUSTO + MEDIA SESSION + SEGUNDO PLANO ---
+        let intentionalPause = false;
+        let isBuffering = false;
+        let playRequestId = 0;
+
+        window.selectSong = function(index) {
+            if (!songs[index]) return;
+            songIndex = index;
+            intentionalPause = false;
+            loadSong(songs[songIndex]);
+            playSong();
+        };
+
+        function safeMediaAction(action, handler) {
+            if (!('mediaSession' in navigator)) return;
+            try {
+                navigator.mediaSession.setActionHandler(action, handler);
+            } catch (error) {
+                console.debug(`Media Session: acción no disponible (${action})`, error);
+            }
+        }
+
+        function updateMediaSession(song) {
+            if (!('mediaSession' in navigator) || !song) return;
+
+            try {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: song.title || 'Himno',
+                    artist: song.artist || 'Himnario Cristiano',
+                    album: 'Himnario Cristiano',
+                    artwork: [{
+                        src: globalCoverUrl,
+                        sizes: '512x512',
+                        type: 'image/png'
+                    }]
+                });
+            } catch (error) {
+                console.debug('No se pudo actualizar MediaMetadata:', error);
+            }
+
+            safeMediaAction('play', playSong);
+            safeMediaAction('pause', pauseSong);
+            safeMediaAction('previoustrack', prevSong);
+            safeMediaAction('nexttrack', nextSong);
+
+            // Controles adicionales disponibles en algunos navegadores.
+            safeMediaAction('seekbackward', () => seekBy(-10));
+            safeMediaAction('seekforward', () => seekBy(10));
+        }
+
+        function setMediaPlaybackState(state) {
+            if (!('mediaSession' in navigator)) return;
+            try {
+                navigator.mediaSession.playbackState = state;
+            } catch (error) {
+                console.debug('No se pudo actualizar MediaSession:', error);
+            }
+        }
+
+        function updatePlayButton(playing) {
+            isPlaying = playing;
+            playIcon.innerHTML = playing ? iconPause : iconPlay;
+            coverEl.style.animationPlayState = playing ? 'running' : 'paused';
+        }
+
+        function loadSong(song) {
+            if (!song) return;
+
+            titleEl.innerText = song.title || 'Sin título';
+            artistEl.innerText = song.artist || '';
+
+            // Evita conservar estados del audio anterior al cambiar de himno.
+            isBuffering = false;
+            audio.pause();
+            audio.currentTime = 0;
+            audio.src = formatDropboxStreamUrl(song.src);
+            audio.load();
+
+            updatePlayButton(false);
+            setMediaPlaybackState('none');
+            renderPlaylist();
+            updateMediaSession(song);
+        }
+
+        async function playSong() {
+            if (!audio.src) return;
+
+            intentionalPause = false;
+            const requestId = ++playRequestId;
+
+            try {
+                // play() debe ejecutarse como consecuencia de una acción del usuario
+                // cuando el navegador exija una interacción previa.
+                await audio.play();
+
+                // Ignora una promesa antigua si el usuario cambió de himno rápidamente.
+                if (requestId !== playRequestId) return;
+
+                isBuffering = false;
+                updatePlayButton(true);
+                setMediaPlaybackState('playing');
+            } catch (error) {
+                if (requestId !== playRequestId) return;
+
+                updatePlayButton(false);
+                setMediaPlaybackState('paused');
+                console.debug('La reproducción requiere interacción del usuario:', error);
+            }
+        }
+
+        function pauseSong() {
+            intentionalPause = true;
+            ++playRequestId;
+            audio.pause();
+            isBuffering = false;
+            updatePlayButton(false);
+            setMediaPlaybackState('paused');
+        }
+
+        function seekBy(seconds) {
+            if (!Number.isFinite(audio.duration)) return;
+            audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + seconds));
+        }
+
+        playBtn.addEventListener('click', () => {
+            if (audio.paused || !isPlaying) {
+                playSong();
+            } else {
+                pauseSong();
+            }
+        });
+
+        function prevSong() {
+            const filtered = getFilteredIndices();
+            if (filtered.length === 0) return;
+
+            const currentIdxInFiltered = filtered.indexOf(songIndex);
+            const nextIndex = currentIdxInFiltered === -1
+                ? filtered[0]
+                : filtered[(currentIdxInFiltered - 1 + filtered.length) % filtered.length];
+
+            const shouldContinue = isPlaying || !audio.paused;
+            songIndex = nextIndex;
+            loadSong(songs[songIndex]);
+            if (shouldContinue) playSong();
+        }
+
+        function nextSong() {
+            const filtered = getFilteredIndices();
+            if (filtered.length === 0) return;
+
+            const currentIdxInFiltered = filtered.indexOf(songIndex);
+            const nextIndex = currentIdxInFiltered === -1
+                ? filtered[0]
+                : filtered[(currentIdxInFiltered + 1) % filtered.length];
+
+            const shouldContinue = isPlaying || !audio.paused;
+            songIndex = nextIndex;
+            loadSong(songs[songIndex]);
+            if (shouldContinue) playSong();
+        }
+
+        prevBtn.addEventListener('click', prevSong);
+        nextBtn.addEventListener('click', nextSong);
+
+        // Al terminar un himno, continúa automáticamente con el siguiente.
+        audio.addEventListener('ended', () => {
+            isBuffering = false;
+            updatePlayButton(false);
+            setMediaPlaybackState('none');
+            nextSong();
+        });
+
+        audio.addEventListener('timeupdate', (e) => {
+            const { currentTime, duration } = e.srcElement;
+            if (!Number.isFinite(duration) || duration <= 0) return;
+
+            const progressPercent = Math.min(100, Math.max(0, (currentTime / duration) * 100));
+            progressBar.style.width = `${progressPercent}%`;
+
+            let currMins = Math.floor(currentTime / 60);
+            let currSecs = Math.floor(currentTime % 60);
+            currSecs = currSecs < 10 ? `0${currSecs}` : currSecs;
+            currTimeEl.innerText = `${currMins}:${currSecs}`;
+
+            let totMins = Math.floor(duration / 60);
+            let totSecs = Math.floor(duration % 60);
+            totSecs = totSecs < 10 ? `0${totSecs}` : totSecs;
+            totalTimeEl.innerText = `${totMins}:${totSecs}`;
+        });
+
+        progressArea.addEventListener('click', (e) => {
+            if (!Number.isFinite(audio.duration) || audio.duration <= 0) return;
+            const rect = progressArea.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const ratio = Math.max(0, Math.min(1, clickX / rect.width));
+            audio.currentTime = ratio * audio.duration;
+        });
+
+        // Estados reales del elemento <audio>.
+        audio.addEventListener('playing', () => {
+            isBuffering = false;
+            intentionalPause = false;
+            updatePlayButton(true);
+            setMediaPlaybackState('playing');
+        });
+
+        audio.addEventListener('play', () => {
+            if (!intentionalPause) {
+                updatePlayButton(true);
+            }
+        });
+
+        audio.addEventListener('pause', () => {
+            // Durante buffering NO forzamos aquí el estado de pausa.
+            if (isBuffering && !intentionalPause) return;
+
+            updatePlayButton(false);
+            if (intentionalPause) {
+                setMediaPlaybackState('paused');
+            }
+        });
+
+        audio.addEventListener('waiting', () => {
+            // El audio sigue teniendo intención de reproducirse: solo esperamos datos.
+            if (!intentionalPause && !audio.ended) {
+                isBuffering = true;
+                updatePlayButton(true);
+                setMediaPlaybackState('playing');
+            }
+        });
+
+        audio.addEventListener('stalled', () => {
+            if (!intentionalPause && !audio.ended) {
+                isBuffering = true;
+                setMediaPlaybackState('playing');
+            }
+        });
+
+        audio.addEventListener('canplay', () => {
+            if (isBuffering && !intentionalPause) {
+                isBuffering = false;
+                setMediaPlaybackState('playing');
+                if (audio.paused) playSong();
+            }
+        });
+
+        audio.addEventListener('error', () => {
+            isBuffering = false;
+            updatePlayButton(false);
+            setMediaPlaybackState('none');
+            console.warn('No se pudo reproducir el audio:', audio.error);
+        });
+
+        // Inicializar Filtros
+        initThemeFilter();
+
+        // Inicializar reproductor
+        loadSong(songs[songIndex]);
+    </script>
+<script>
+        // --- REGISTRO DEL SERVICE WORKER PARA PWA ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('ServiceWorker registrado:', registration.scope))
+                    .catch(error => console.log('Fallo ServiceWorker:', error));
+            });
+        }
+
+        // --- LÓGICA DEL BANNER DE INSTALACIÓN PWA ---
+        let deferredPrompt;
+        const installBanner = document.getElementById('installBanner');
+        const btnInstallApp = document.getElementById('btnInstallApp');
+        const btnCloseBanner = document.getElementById('btnCloseBanner');
+
+        // Escucha el evento que detecta si la app se puede instalar
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); // Evita que Chrome muestre el prompt automático
+            deferredPrompt = e; // Guarda el evento
+            installBanner.classList.add('show'); // Muestra nuestro banner personalizado
+        });
+
+        // Acción al hacer clic en instalar
+        btnInstallApp.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                installBanner.classList.remove('show');
+                deferredPrompt.prompt(); // Muestra el mensaje nativo de instalación del sistema
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('App instalada');
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // Acción al cerrar el banner
+        btnCloseBanner.addEventListener('click', () => {
+            installBanner.classList.remove('show');
+        });
+
+        // Si ya se instaló, ocultar el banner por seguridad
+        window.addEventListener('appinstalled', () => {
+            installBanner.classList.remove('show');
+            deferredPrompt = null;
+        });
+    </script>
 </body>
 </html>
