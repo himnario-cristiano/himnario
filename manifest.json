@@ -9,12 +9,12 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "Himnario-Cristiano.png",
+      "src": "HimnarioCristiano.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "Himnario-Cristiano.png",
+      "src": "HimnarioCristiano.png",
       "sizes": "512x512",
       "type": "image/png"
     }
