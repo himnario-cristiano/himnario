@@ -2,6 +2,7 @@ const CACHE_NAME = 'himnario-cache-v1';
 const urlsToCache = [
   './',
   './index.html',
+  './songs.js',               // <-- Agrega esta línea
   './manifest.json',
   'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap',
   'https://i.postimg.cc/14xJ49F9/LOGO-Himnario-Cristiano.png'
