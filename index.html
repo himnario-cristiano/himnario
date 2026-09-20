@@ -770,7 +770,7 @@
             </div>
         </div>
     </div> <!-- Cierre de player-container -->
-    <audio id="mainAudioPlayer" preload="auto"></audio>
+    <audio id="mainAudioPlayer" preload="auto" playsinline controls style="display: none;"></audio>
 
     <div class="player-container">
         <!-- Reproductor Superior -->
@@ -1362,6 +1362,26 @@
         
         // Inicializar reproductor
         loadSong(songs[songIndex]);
+// Mantener viva la sesión multimedia si hay micro-cortes de internet
+        audio.addEventListener("playing", () => {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = "playing";
+            }
+        });
+
+        audio.addEventListener("pause", () => {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = "paused";
+            }
+        });
+
+        audio.addEventListener("waiting", () => {
+            // Le decimos al SO que seguimos reproduciendo, solo estamos cargando (buffering)
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = "playing"; 
+            }
+        });
+		
     </script>
 <script>
         // --- REGISTRO DEL SERVICE WORKER PARA PWA ---
