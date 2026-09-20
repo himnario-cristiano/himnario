@@ -1,1273 +1,1279 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIMNARIO CRISTIANO</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HIMNARIO CRISTIANO</title>
 
-<!-- Etiquetas PWA -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#121212">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --text-scale: 1; 
-        }
+    <!-- Etiquetas PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121212">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --text-scale: 1; 
+        }
 
-        body { 
-            background-color: #121212; 
-            width: 100vw; 
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
 
-        .player-container { 
-            width: 100%; 
-            height: 100%; 
-            background: #121212; 
-            display: flex; 
-            flex-direction: column; 
-            color: #fff; 
-            overflow: hidden;
-        }
+        body { 
+            background-color: #121212; 
+            width: 100vw; 
+            height: 100vh; 
+            overflow: hidden; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+        }
 
-        /* Reproductor Superior */
-        .now-playing { 
-            background: #121212; 
-            padding: 15px 20px; 
-            display: flex; 
-            flex-direction: column; 
-            border-bottom: 1px solid #282828; 
-            position: relative; 
-            flex-shrink: 0;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
+        .player-container { 
+            width: 100%; 
+            height: 100%; 
+            background: #121212; 
+            display: flex; 
+            flex-direction: column; 
+            color: #fff; 
+            overflow: hidden;
+        }
 
-        .top-row {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            position: relative;
-        }
+        /* Reproductor Superior */
+        .now-playing { 
+            background: #121212; 
+            padding: 15px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            border-bottom: 1px solid #282828; 
+            position: relative; 
+            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
 
-        /* Contenedor de Botones Superior Derecho */
-        .top-right-actions {
-            position: absolute;
-            top: 1px; 
-            right: 20px;
-            display: flex;
-            gap: 12px;
-            z-index: 10;
-        }
+        .top-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            position: relative;
+        }
 
-        .btn-action {
-            background: none;
-            border: none;
-            color: #b3b3b3;
-            cursor: pointer;
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.3s ease;
-        }
-        .btn-action svg { width: 24px; height: 24px; fill: currentColor; }
-        .btn-action:hover { color: #f7d694; }
+        /* Contenedor de Botones Superior Derecho */
+        .top-right-actions {
+            position: absolute;
+            top: 5px; 
+            right: 20px;
+            display: flex;
+            gap: 12px;
+            z-index: 10;
+        }
 
-        .font-size-panel {
-            display: none;
-            position: absolute;
-            top: 45px; 
-            right: 20px;
-            background: #282828;
-            border: 1px solid #3e3e3e;
-            border-radius: 8px;
-            padding: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-            z-index: 20;
-            flex-direction: column;
-            gap: 12px;
-            min-width: 150px;
-        }
-        .font-size-panel.show { display: flex; }
+        .btn-action {
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease;
+        }
+        .btn-action svg { width: 24px; height: 24px; fill: currentColor; }
+        .btn-action:hover { color: #f7d694; }
 
-        .fs-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .font-size-panel {
+            display: none;
+            position: absolute;
+            top: 45px; 
+            right: 20px;
+            background: #282828;
+            border: 1px solid #3e3e3e;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            z-index: 20;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 150px;
+        }
+        .font-size-panel.show { display: flex; }
 
-        .fs-row button {
-            background: #4f4f4f;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            width: 34px;
-            height: 34px;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        .fs-row button:hover { background: #f7d694; color: #000; }
+        .fs-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-        #fsDisplay {
-            color: #fff;
-            font-size: 14px;
-            font-weight: 600;
-            min-width: 45px;
-            text-align: center;
-        }
+        .fs-row button {
+            background: #4f4f4f;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            width: 34px;
+            height: 34px;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .fs-row button:hover { background: #f7d694; color: #000; }
 
-        #fsReset {
-            background: transparent;
-            color: #b3b3b3;
-            border: 1px solid #4f4f4f;
-            padding: 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        #fsReset:hover { background: #4f4f4f; color: #fff; }
+        #fsDisplay {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 45px;
+            text-align: center;
+        }
 
-        /* Vinilo compacto arriba */
-        .vinyl-wrapper { 
-            position: relative; 
-            width: 80px; 
-            height: 80px; 
-            flex-shrink: 0;
-            border-radius: 50%;
-            box-shadow: 0 0 0 6px #0a0a0a, 0 6px 15px rgba(0,0,0,0.6); 
-        }
+        #fsReset {
+            background: transparent;
+            color: #b3b3b3;
+            border: 1px solid #4f4f4f;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        #fsReset:hover { background: #4f4f4f; color: #fff; }
 
-        .vinyl-wrapper::after { 
-            content: ''; 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            width: 14px; 
-            height: 14px; 
-            background: #ffffff; 
-            border-radius: 50%; 
-            z-index: 2; 
-            box-shadow: inset 0 0 3px rgba(0,0,0,0.8); 
-        }
+        /* Vinilo compacto arriba */
+        .vinyl-wrapper { 
+            position: relative; 
+            width: 80px; 
+            height: 80px; 
+            flex-shrink: 0;
+            border-radius: 50%;
+            box-shadow: 0 0 0 6px #0a0a0a, 0 6px 15px rgba(0,0,0,0.6); 
+        }
 
-        .cover-vinyl { 
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            display: block;
-            animation: spin 4s linear infinite; 
-            animation-play-state: paused; 
-        }
+        .vinyl-wrapper::after { 
+            content: ''; 
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            width: 14px; 
+            height: 14px; 
+            background: #ffffff; 
+            border-radius: 50%; 
+            z-index: 2; 
+            box-shadow: inset 0 0 3px rgba(0,0,0,0.8); 
+        }
 
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .cover-vinyl { 
+            width: 100%; 
+            height: 100%; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            display: block;
+            animation: spin 4s linear infinite; 
+            animation-play-state: paused; 
+        }
 
-        .info-current { 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center;
-            overflow: hidden;
-            flex: 1;
-            padding-right: 40px; 
-        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        .title-current { 
-            font-size: calc(16px * var(--text-scale)); 
-            font-weight: 700; 
-            color: #fff;
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            margin-bottom: 2px;
-            transition: font-size 0.2s;
-        }
+        .info-current { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center;
+            overflow: hidden;
+            flex: 1;
+            padding-right: 40px; 
+        }
 
-        .artist-current { 
-            font-size: calc(13px * var(--text-scale)); 
-            color: #b3b3b3; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            transition: font-size 0.2s;
-        }
+        .title-current { 
+            font-size: calc(16px * var(--text-scale)); 
+            font-weight: 700; 
+            color: #fff;
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            margin-bottom: 2px;
+            transition: font-size 0.2s;
+        }
 
-        .progress-container { 
-            width: 100%; 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 12px; 
-            font-size: calc(11px * var(--text-scale)); 
-            color: #b3b3b3; 
-            transition: font-size 0.2s;
-        }
+        .artist-current { 
+            font-size: calc(13px * var(--text-scale)); 
+            color: #b3b3b3; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            transition: font-size 0.2s;
+        }
 
-        .progress-bar-bg { 
-            flex: 1; 
-            height: 4px; 
-            background: #4f4f4f; 
-            border-radius: 5px; 
-            margin: 0 10px; 
-            cursor: pointer; 
-            position: relative; 
-        }
+        .progress-container { 
+            width: 100%; 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 12px; 
+            font-size: calc(11px * var(--text-scale)); 
+            color: #b3b3b3; 
+            transition: font-size 0.2s;
+        }
 
-        .progress-bar-fill { 
-            height: 100%; 
-            background: #f7d694; 
-            border-radius: 5px; 
-            width: 0%; 
-            transition: width 0.1s linear, background 0.2s; 
-        }
+        .progress-bar-bg { 
+            flex: 1; 
+            height: 4px; 
+            background: #4f4f4f; 
+            border-radius: 5px; 
+            margin: 0 10px; 
+            cursor: pointer; 
+            position: relative; 
+        }
 
-        .controls { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 25px; 
-        }
+        .progress-bar-fill { 
+            height: 100%; 
+            background: #f7d694; 
+            border-radius: 5px; 
+            width: 0%; 
+            transition: width 0.1s linear, background 0.2s; 
+        }
 
-        .btn { 
-            background: none; 
-            border: none; 
-            color: #b3b3b3; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            transition: color 0.2s, transform 0.2s; 
-        }
+        .controls { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 25px; 
+        }
 
-        .btn:hover { color: #f7d694; }
-        .btn svg { width: 20px; height: 20px; fill: currentColor; }
+        .btn { 
+            background: none; 
+            border: none; 
+            color: #b3b3b3; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: color 0.2s, transform 0.2s; 
+        }
 
-        .btn-play { 
-            background: #fff; 
-            color: #000; 
-            border-radius: 50%; 
-            width: 44px; 
-            height: 44px; 
-            transition: all 0.3s ease; 
-        }
+        .btn:hover { color: #f7d694; }
+        .btn svg { width: 20px; height: 20px; fill: currentColor; }
 
-        .btn-play:hover { 
-            transform: scale(1.05); 
-            color: #000; 
-            background: #f7d694; 
-        }
+        .btn-play { 
+            background: #fff; 
+            color: #000; 
+            border-radius: 50%; 
+            width: 44px; 
+            height: 44px; 
+            transition: all 0.3s ease; 
+        }
 
-        .btn-play svg { width: 22px; height: 22px; }
+        .btn-play:hover { 
+            transform: scale(1.05); 
+            color: #000; 
+            background: #f7d694; 
+        }
 
-        /* Contenedor Principal de la Lista de reproducción */
-        .playlist { 
-            flex: 1; 
-            background: #181818; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            overflow: hidden; 
-        }
+        .btn-play svg { width: 22px; height: 22px; }
 
-        /* Header de la lista */
-        .playlist-header {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 15px 20px 10px 20px;
-        }
+        /* Contenedor Principal de la Lista de reproducción */
+        .playlist { 
+            flex: 1; 
+            background: #181818; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            overflow: hidden; 
+        }
 
-        .search-container {
-            display: flex;
-            align-items: center;
-            background: #282828;
-            border-radius: 20px;
-            padding: 8px 15px;
-            flex: 1;
-            border: 1px solid transparent;
-            transition: border-color 0.3s, background 0.3s;
-        }
+        /* Header de la lista */
+        .playlist-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px 10px 20px;
+        }
 
-        .search-container:focus-within {
-            border-color: #f7d694;
-            background: #2a2a2a;
-        }
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: #282828;
+            border-radius: 20px;
+            padding: 8px 15px;
+            flex: 1;
+            border: 1px solid transparent;
+            transition: border-color 0.3s, background 0.3s;
+        }
 
-        .search-icon {
-            width: 18px;
-            height: 18px;
-            fill: #b3b3b3;
-            margin-right: 10px;
-            flex-shrink: 0;
-        }
+        .search-container:focus-within {
+            border-color: #f7d694;
+            background: #2a2a2a;
+        }
 
-        .search-input {
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 14px;
-            width: 100%;
-            outline: none;
-            font-family: 'Montserrat', sans-serif;
-        }
+        .search-icon {
+            width: 18px;
+            height: 18px;
+            fill: #b3b3b3;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
 
-        .search-input::placeholder { color: #888; }
+        .search-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+        }
 
-        /* Select de Temas */
-        .theme-select {
-            background: #282828;
-            color: #b3b3b3;
-            border: 1px solid transparent;
-            border-radius: 20px;
-            padding: 8px 12px;
-            font-size: 13px;
-            outline: none;
-            cursor: pointer;
-            transition: border-color 0.3s, color 0.3s, background 0.3s;
-            font-family: 'Montserrat', sans-serif;
-            flex-shrink: 0;
-            max-width: 150px;
-        }
-        .theme-select:focus, .theme-select:hover {
-            border-color: #f7d694;
-            color: #fff;
-            background: #2a2a2a;
-        }
-        .theme-select option {
-            background: #282828;
-            color: #fff;
-        }
+        .search-input::placeholder { color: #888; }
 
-        .fav-filter-btn {
-            background: none;
-            border: none;
-            color: #b3b3b3;
-            cursor: pointer;
-            padding: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.3s;
-        }
+        /* Select de Temas */
+        .theme-select {
+            background: #282828;
+            color: #b3b3b3;
+            border: 1px solid transparent;
+            border-radius: 20px;
+            padding: 8px 12px;
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.3s, color 0.3s, background 0.3s;
+            font-family: 'Montserrat', sans-serif;
+            flex-shrink: 0;
+            max-width: 150px;
+        }
+        .theme-select:focus, .theme-select:hover {
+            border-color: #f7d694;
+            color: #fff;
+            background: #2a2a2a;
+        }
+        .theme-select option {
+            background: #282828;
+            color: #fff;
+        }
 
-        .fav-filter-btn svg { width: 28px; height: 28px; transition: all 0.3s ease; }
-        .fav-filter-btn:hover { color: #fff; }
-        .fav-filter-btn.active { color: #f7d694; }
-        .fav-filter-btn.active svg { fill: #f7d694; }
+        .fav-filter-btn {
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+        }
 
-        /* Contenedor de los items */
-        .playlist-items-container {
-            width: 100%;
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 20px 15px 20px;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .playlist-item { 
-            position: relative;
-            width: 100%; 
-            display: flex; 
-            align-items: center; 
-            padding: 10px 14px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: background 0.3s; 
-            margin-bottom: 6px; 
-        }
-        
-        .playlist-item:hover { background: #282828; }
-        .playlist-item.active { background: #2a2a2a; }
-        .playlist-item.active .song-title-list { color: #f7d694; }
+        .fav-filter-btn svg { width: 28px; height: 28px; transition: all 0.3s ease; }
+        .fav-filter-btn:hover { color: #fff; }
+        .fav-filter-btn.active { color: #f7d694; }
+        .fav-filter-btn.active svg { fill: #f7d694; }
 
-        .playlist-item img { 
-            width: 42px; 
-            height: 42px; 
-            border-radius: 50%; 
-            margin-right: 12px; 
-            object-fit: cover; 
-            box-shadow: 0 0 0 2px #0a0a0a; 
-            flex-shrink: 0;
-        }
-        
-        .song-info-list { 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden;
-            flex: 1;
-        }
-        
-        .song-title-list { 
-            font-size: calc(14px * var(--text-scale)); 
-            font-weight: 600; 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: font-size 0.2s;
-        }
-        
-        .song-artist-list { 
-            font-size: calc(12px * var(--text-scale)); 
-            color: #b3b3b3; 
-            margin-top: 2px; 
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            transition: font-size 0.2s;
-        }
+        /* Contenedor de los items */
+        .playlist-items-container {
+            width: 100%;
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 20px 15px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .playlist-item { 
+            position: relative;
+            width: 100%; 
+            display: flex; 
+            align-items: center; 
+            padding: 10px 14px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: background 0.3s; 
+            margin-bottom: 6px; 
+        }
+        
+        .playlist-item:hover { background: #282828; }
+        .playlist-item.active { background: #2a2a2a; }
+        .playlist-item.active .song-title-list { color: #f7d694; }
 
-        /* Envoltorio de las acciones del track */
-        .song-actions-wrapper {
-            display: flex;
-            align-items: center;
-        }
-        
-        /* Botones de acción base */
-        .action-btn {
-            background: none;
-            border: none;
-            color: #b3b3b3;
-            cursor: pointer;
-            padding: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background 0.2s, color 0.2s;
-            margin-left: 5px;
-            flex-shrink: 0;
-        }
+        .playlist-item img { 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 50%; 
+            margin-right: 12px; 
+            object-fit: cover; 
+            box-shadow: 0 0 0 2px #0a0a0a; 
+            flex-shrink: 0;
+        }
+        
+        .song-info-list { 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .song-title-list { 
+            font-size: calc(14px * var(--text-scale)); 
+            font-weight: 600; 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: font-size 0.2s;
+        }
+        
+        .song-artist-list { 
+            font-size: calc(12px * var(--text-scale)); 
+            color: #b3b3b3; 
+            margin-top: 2px; 
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: font-size 0.2s;
+        }
 
-        .action-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
-        .action-btn svg { width: 20px; height: 20px; fill: currentColor; }
+        /* Envoltorio de las acciones del track */
+        .song-actions-wrapper {
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Botones de acción base */
+        .action-btn {
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s, color 0.2s;
+            margin-left: 5px;
+            flex-shrink: 0;
+        }
 
-        button.action-btn.more-options-btn {
-            display: none;
-            margin-left: 5px;
-        }
+        .action-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
+        .action-btn svg { width: 20px; height: 20px; fill: currentColor; }
 
-        .fav-btn.active { color: #f7d694; }
-        .fav-btn.active svg { fill: #f7d694; stroke: #f7d694; }
-        .fav-btn svg { stroke: currentColor; stroke-width: 2; fill: none; }
+        button.action-btn.more-options-btn {
+            display: none;
+            margin-left: 5px;
+        }
 
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #4f4f4f; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #f7d694; }
+        .fav-btn.active { color: #f7d694; }
+        .fav-btn.active svg { fill: #f7d694; stroke: #f7d694; }
+        .fav-btn svg { stroke: currentColor; stroke-width: 2; fill: none; }
 
-        /* Estilos del Modal Base */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(0, 0, 0, 0.75);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .modal-overlay.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .modal-content {
-            background: #282828;
-            padding: 30px 25px;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 380px;
-            text-align: center;
-            position: relative;
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            color: #fff;
-            border: 1px solid #3e3e3e;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .modal-overlay.show .modal-content {
-            transform: translateY(0);
-        }
-        .modal-close {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: #b3b3b3;
-            font-size: 28px;
-            line-height: 1;
-            cursor: pointer;
-            transition: color 0.2s;
-            z-index: 2;
-        }
-        .modal-close:hover { color: #f7d694; }
-        
-        .modal-content h3 {
-            margin-bottom: 10px;
-            color: #f7d694;
-            font-size: 18px;
-            padding-right: 20px;
-        }
-        .modal-content p {
-            font-size: 14px;
-            color: #b3b3b3;
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-        
-        /* Estilos específicos para el Modal de Referencias y Tema */
-        .ref-theme-badge {
-            font-size: 13px;
-            color: #b3b3b3;
-            margin: 0 auto 15px auto;
-            text-align: center;
-            background: #1e1e1e;
-            padding: 6px 14px;
-            border-radius: 15px;
-            border: 1px solid #3e3e3e;
-            display: inline-block;
-        }
-        .ref-theme-badge span {
-            color: #fff;
-            font-weight: 600;
-            margin-left: 5px;
-        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #4f4f4f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #f7d694; }
 
-        #refModalBody {
-            overflow-y: auto;
-            text-align: left;
-            margin-top: 5px;
-        }
-        .ref-list {
-            list-style: none;
-            padding: 0;
-        }
-        .ref-item {
-            background: #333;
-            padding: 12px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 4px solid #f7d694;
-        }
-        .ref-hymnal {
-            font-weight: 600;
-            font-size: 13px;
-            color: #fff;
-        }
-        .ref-number {
-            font-weight: bold;
-            color: #000;
-            background: #f7d694;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
+        /* Estilos del Modal Base */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            background: #282828;
+            padding: 30px 25px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            color: #fff;
+            border: 1px solid #3e3e3e;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+            transition: color 0.2s;
+            z-index: 2;
+        }
+        .modal-close:hover { color: #f7d694; }
+        
+        .modal-content h3 {
+            margin-bottom: 10px;
+            color: #f7d694;
+            font-size: 18px;
+            padding-right: 20px;
+        }
+        .modal-content p {
+            font-size: 14px;
+            color: #b3b3b3;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        
+        /* Estilos específicos para el Modal de Referencias y Tema */
+        .ref-theme-badge {
+            font-size: 13px;
+            color: #b3b3b3;
+            margin: 0 auto 15px auto;
+            text-align: center;
+            background: #1e1e1e;
+            padding: 6px 14px;
+            border-radius: 15px;
+            border: 1px solid #3e3e3e;
+            display: inline-block;
+        }
+        .ref-theme-badge span {
+            color: #fff;
+            font-weight: 600;
+            margin-left: 5px;
+        }
 
-        .whatsapp-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: #25D366;
-            color: #000;
-            border: none;
-            cursor: pointer;
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 16px;
-            margin-top: 10px;
-            transition: background 0.2s, transform 0.2s;
-            width: 100%;
-            font-family: inherit;
-        }
-        .whatsapp-btn:hover {
-            background: #1ebe57;
-            transform: scale(1.02);
-        }
+        #refModalBody {
+            overflow-y: auto;
+            text-align: left;
+            margin-top: 5px;
+        }
+        .ref-list {
+            list-style: none;
+            padding: 0;
+        }
+        .ref-item {
+            background: #333;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid #f7d694;
+        }
+        .ref-hymnal {
+            font-weight: 600;
+            font-size: 13px;
+            color: #fff;
+        }
+        .ref-number {
+            font-weight: bold;
+            color: #000;
+            background: #f7d694;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
 
-        /* --- RESPONSIVE: COMPORTAMIENTO MÓVIL --- */
-        @media (max-width: 480px) {
-            .vinyl-wrapper { width: 65px; height: 65px; }
-            .title-current { font-size: calc(15px * var(--text-scale)); }
-            
-            /* Ajustes del Header de Playlist en Móvil */
-            .playlist-header { 
-                padding: 15px 10px 10px 10px; 
-                flex-wrap: wrap; 
-            }
-            .search-container {
-                width: 100%;
-                flex: 0 0 100%; 
-                margin-bottom: 8px;
-                order: 1;
-            }
-            .theme-select {
-                flex: 1; 
-                order: 2;
-                max-width: none;
-            }
-            .fav-filter-btn {
-                order: 3;
-            }
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: #000;
+            border: none;
+            cursor: pointer;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background 0.2s, transform 0.2s;
+            width: 100%;
+            font-family: inherit;
+        }
+        .whatsapp-btn:hover {
+            background: #1ebe57;
+            transform: scale(1.02);
+        }
 
-            .playlist-items-container { padding: 0 10px 10px 10px; }
-            
-            .top-right-actions { top: 5px; right: 10px; } 
-            .font-size-panel { right: 10px; top: 40px; } 
+        /* --- RESPONSIVE: COMPORTAMIENTO MÓVIL --- */
+        @media (max-width: 480px) {
+            .vinyl-wrapper { width: 65px; height: 65px; }
+            .title-current { font-size: calc(15px * var(--text-scale)); }
+            
+            /* Ajustes del Header de Playlist en Móvil */
+            .playlist-header { 
+                padding: 15px 10px 10px 10px; 
+                flex-wrap: wrap; 
+            }
+            .search-container {
+                width: 100%;
+                flex: 0 0 100%; 
+                margin-bottom: 8px;
+                order: 1;
+            }
+            .theme-select {
+                flex: 1; 
+                order: 2;
+                max-width: none;
+            }
+            .fav-filter-btn {
+                order: 3;
+            }
 
-            .action-btn svg { width: 18px; height: 18px; }
-            
-            /* Ocultamos los botones y mostramos los 3 puntos */
-            button.action-btn.more-options-btn {
-                display: flex; 
-            }
-            .song-actions-wrapper {
-                display: none;
-                position: absolute;
-                right: 40px;
-                top: 50%;
-                transform: translateY(-50%);
-                background: #282828;
-                padding: 4px;
-                border-radius: 20px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-                border: 1px solid #3e3e3e;
-                z-index: 100;
-            }
-            
-            .song-actions-wrapper.show {
-                display: flex;
-                flex-direction: row;
-                gap: 2px;
-                animation: slideInRight 0.2s ease;
-            }
-        }
-        
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translate(10px, -50%); }
-            to { opacity: 1; transform: translate(0, -50%); }
-        }
+            .playlist-items-container { padding: 0 10px 10px 10px; }
+            
+            .top-right-actions { top: 5px; right: 10px; } 
+            .font-size-panel { right: 10px; top: 40px; } 
 
-		/* --- BANNER DE INSTALACIÓN PWA --- */
-        .install-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #1e1e1e;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 20px;
-            box-shadow: 0 -4px 15px rgba(0,0,0,0.6);
-            transform: translateY(100%);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 2000;
-            border-top: 1px solid #3e3e3e;
-        }
-        .install-banner.show {
-            transform: translateY(0);
-        }
-        .install-banner-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .install-banner-text {
-            font-size: 14px;
-            font-weight: 600;
-        }
-        .install-banner-actions {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .btn-install {
-            background: #f7d694;
-            color: #000;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 13px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: transform 0.2s, background 0.2s;
-        }
-        .btn-install:hover { background: #e5c483; transform: scale(1.05); }
-        .btn-install svg { width: 18px; height: 18px; fill: currentColor; }
-        
-        .btn-close-banner {
-            background: none;
-            border: none;
-            color: #b3b3b3;
-            cursor: pointer;
-            padding: 5px;
-            display: flex;
-            transition: color 0.2s;
-        }
-        .btn-close-banner:hover { color: #fff; }
-        .btn-close-banner svg { width: 22px; height: 22px; fill: currentColor; }
+            .action-btn svg { width: 18px; height: 18px; }
+            
+            /* Ocultamos los botones y mostramos los 3 puntos */
+            button.action-btn.more-options-btn {
+                display: flex; 
+            }
+            .song-actions-wrapper {
+                display: none;
+                position: absolute;
+                right: 40px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: #282828;
+                padding: 4px;
+                border-radius: 20px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+                border: 1px solid #3e3e3e;
+                z-index: 100;
+            }
+            
+            .song-actions-wrapper.show {
+                display: flex;
+                flex-direction: row;
+                gap: 2px;
+                animation: slideInRight 0.2s ease;
+            }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translate(10px, -50%); }
+            to { opacity: 1; transform: translate(0, -50%); }
+        }
 
-        @media (max-width: 480px) {
-            .btn-install span { 
-                display: none; 
-            }
-            .install-banner-text {
-                font-size: 13px;
-            }
-        }
-    </style>
+        /* --- BANNER DE INSTALACIÓN PWA --- */
+        .install-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1e1e1e;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 20px;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.6);
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            border-top: 1px solid #3e3e3e;
+        }
+        .install-banner.show {
+            transform: translateY(0);
+        }
+        .install-banner-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .install-banner-text {
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .install-banner-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn-install {
+            background: #f7d694;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .btn-install:hover { background: #e5c483; transform: scale(1.05); }
+        .btn-install svg { width: 18px; height: 18px; fill: currentColor; }
+        
+        .btn-close-banner {
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            transition: color 0.2s;
+        }
+        .btn-close-banner:hover { color: #fff; }
+        .btn-close-banner svg { width: 22px; height: 22px; fill: currentColor; }
+
+        @media (max-width: 480px) {
+            .btn-install span { 
+                display: none; 
+            }
+            .install-banner-text {
+                font-size: 13px;
+            }
+        }
+    </style>
 </head>
 <body>
-<!-- Banner de Instalación -->
-        <div class="install-banner" id="installBanner">
-            <div class="install-banner-info">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="#f7d694">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-                </svg>
-                <div class="install-banner-text">Instalar App Himnario</div>
-            </div>
-            <div class="install-banner-actions">
-                <button class="btn-install" id="btnInstallApp">
-                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                    <span>Instalar</span>
-                </button>
-                <button class="btn-close-banner" id="btnCloseBanner">
-                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-                </button>
-            </div>
-        </div>
-    </div> <!-- Cierre de player-container -->
-    <audio id="mainAudioPlayer" preload="auto" playsinline controls style="display: none;"></audio>
 
-    <div class="player-container">
-        <!-- Reproductor Superior -->
-        <div class="now-playing" id="nowPlaying">
-            
-            <!-- Contenedor de Botones Superior Derecho -->
-            <div class="top-right-actions">
-                <button class="btn-action" id="helpBtn" title="Soporte y Ayuda">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h4v1h-7v2h6c1.66 0 3-1.34 3-3V10c0-4.97-4.03-9-9-9z"/>
-                    </svg>
-                </button>
-                
-                <button class="btn-action" id="textSizeBtn" title="Ajustar tamaño del texto">
-                    <svg viewBox="0 0 24 24">
-                        <path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/>
-                    </svg>
-                </button>
-            </div>
-            
-            <!-- Panel de control de tamaño de texto -->
-            <div class="font-size-panel" id="textSizePanel">
-                <div class="fs-row">
-                    <button id="fsDecrease">-</button>
-                    <span id="fsDisplay">100%</span>
-                    <button id="fsIncrease">+</button>
-                </div>
-                <button id="fsReset">Restablecer</button>
-            </div>
+    <audio id="mainAudioPlayer" preload="auto"></audio>
 
-            <div class="top-row">
-                <div class="vinyl-wrapper">
-                    <img src="" alt="Vinyl Cover" class="cover-vinyl" id="cover">
-                </div>
-                
-                <div class="info-current">
-                    <div class="title-current" id="title">Cargando...</div>
-                    <div class="artist-current" id="artist"></div>
-                </div>
-            </div>
-            
-            <div class="progress-container">
-                <span id="currTime">0:00</span>
-                <div class="progress-bar-bg" id="progressArea">
-                    <div class="progress-bar-fill" id="progressBar"></div>
-                </div>
-                <span id="totalTime">0:00</span>
-            </div>
-            
-            <div class="controls">
-                <button class="btn btn-hide-mobile" id="prevBtn">
-                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
-                </button>
-                <button class="btn btn-play" id="playBtn">
-                    <svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
-                </button>
-                <button class="btn" id="nextBtn">
-                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
-                </button>
-            </div>
-        </div>
+    <div class="player-container">
+        <!-- Reproductor Superior -->
+        <div class="now-playing" id="nowPlaying">
+            
+            <!-- Contenedor de Botones Superior Derecho -->
+            <div class="top-right-actions">
+                <button class="btn-action" id="helpBtn" title="Soporte y Ayuda">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h4v1h-7v2h6c1.66 0 3-1.34 3-3V10c0-4.97-4.03-9-9-9z"/>
+                    </svg>
+                </button>
+                
+                <button class="btn-action" id="textSizeBtn" title="Ajustar tamaño del texto">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Panel de control de tamaño de texto -->
+            <div class="font-size-panel" id="textSizePanel">
+                <div class="fs-row">
+                    <button id="fsDecrease">-</button>
+                    <span id="fsDisplay">100%</span>
+                    <button id="fsIncrease">+</button>
+                </div>
+                <button id="fsReset">Restablecer</button>
+            </div>
 
-        <!-- Lista de reproducción -->
-        <div class="playlist">
-            <div class="playlist-header">
-                <div class="search-container">
-                    <svg viewBox="0 0 24 24" class="search-icon">
-                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                    </svg>
-                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar canción..." autocomplete="off">
-                </div>
-                
-                <!-- Nuevo Filtro por Tema -->
-                <select id="themeFilter" class="theme-select">
-                    <option value="all">Todos los temas</option>
-                    <!-- Las opciones se generarán por JavaScript -->
-                </select>
+            <div class="top-row">
+                <div class="vinyl-wrapper">
+                    <img src="" alt="Vinyl Cover" class="cover-vinyl" id="cover">
+                </div>
+                
+                <div class="info-current">
+                    <div class="title-current" id="title">Cargando...</div>
+                    <div class="artist-current" id="artist"></div>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <span id="currTime">0:00</span>
+                <div class="progress-bar-bg" id="progressArea">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+                <span id="totalTime">0:00</span>
+            </div>
+            
+            <div class="controls">
+                <button class="btn btn-hide-mobile" id="prevBtn">
+                    <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+                </button>
+                <button class="btn btn-play" id="playBtn">
+                    <svg viewBox="0 0 24 24" id="playIcon"><path d="M8 5v14l11-7z"/></svg>
+                </button>
+                <button class="btn" id="nextBtn">
+                    <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+                </button>
+            </div>
+        </div>
 
-                <button class="fav-filter-btn" id="favFilterBtn" title="Filtrar por Favoritos">
-                    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                </button>
-            </div>
+        <!-- Lista de reproducción -->
+        <div class="playlist">
+            <div class="playlist-header">
+                <div class="search-container">
+                    <svg viewBox="0 0 24 24" class="search-icon">
+                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                    </svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar canción..." autocomplete="off">
+                </div>
+                
+                <!-- Nuevo Filtro por Tema -->
+                <select id="themeFilter" class="theme-select">
+                    <option value="all">Todos los temas</option>
+                    <!-- Las opciones se generarán por JavaScript -->
+                </select>
 
-            <div id="playlistItems" class="playlist-items-container"></div>
-        </div>
-    </div>
+                <button class="fav-filter-btn" id="favFilterBtn" title="Filtrar por Favoritos">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                </button>
+            </div>
 
-    <!-- Modal de Ayuda y Soporte -->
-    <div class="modal-overlay" id="helpModal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeModalBtn">&times;</button>
-            <h3>Soporte Técnico</h3>
-            <p>¿Tienes el audio de algún himno que nos falta o deseas compartir alguno para enriquecer el himnario y nuestra playlist?</p>
-            <p>Si tienes problemas con el reproductor, sugerencias o audios que compartir, contáctanos directamente a nuestro soporte.</p>
-            
-            <button id="btnWhatsappContact" class="whatsapp-btn">
-                <svg viewBox="0 0 24 24" width="22" height="22">
-                    <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
-                Contactar a Soporte
-            </button>
-        </div>
-    </div>
+            <div id="playlistItems" class="playlist-items-container"></div>
+        </div>
+    </div>
 
-    <!-- Modal de Referencias a otros Himnarios -->
-    <div class="modal-overlay" id="refModal">
-        <div class="modal-content">
-            <button class="modal-close" id="closeRefModalBtn">&times;</button>
-            <h3 id="refModalTitle">Referencias</h3>
-            <div id="refModalBody">
-                <!-- Se llenará dinámicamente -->
-            </div>
-        </div>
-    </div>
-  <!-- Llamar al archivo externo con las canciones -->
-    <script src="songs.js"></script>
-	
-    <script>
-        const globalCoverUrl = "https://i.postimg.cc/14xJ49F9/LOGO-Himnario-Cristiano.png";
+    <!-- Modal de Ayuda y Soporte -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModalBtn">&times;</button>
+            <h3>Soporte Técnico</h3>
+            <p>¿Tienes el audio de algún himno que nos falta o deseas compartir alguno para enriquecer el himnario y nuestra playlist?</p>
+            <p>Si tienes problemas con el reproductor, sugerencias o audios que compartir, contáctanos directamente a nuestro soporte.</p>
+            
+            <button id="btnWhatsappContact" class="whatsapp-btn">
+                <svg viewBox="0 0 24 24" width="22" height="22">
+                    <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+                Contactar a Soporte
+            </button>
+        </div>
+    </div>
 
-        let songIndex = 0;
-        const audio = document.getElementById("mainAudioPlayer");
-        let isPlaying = false;
-        let showOnlyFavorites = false; 
+    <!-- Modal de Referencias a otros Himnarios -->
+    <div class="modal-overlay" id="refModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeRefModalBtn">&times;</button>
+            <h3 id="refModalTitle">Referencias</h3>
+            <div id="refModalBody">
+                <!-- Se llenará dinámicamente -->
+            </div>
+        </div>
+    </div>
 
-        const playlistEl = document.getElementById("playlistItems");
-        const coverEl = document.getElementById("cover");
-        const titleEl = document.getElementById("title");
-        const artistEl = document.getElementById("artist");
-        const playBtn = document.getElementById("playBtn");
-        const playIcon = document.getElementById("playIcon");
-        const prevBtn = document.getElementById("prevBtn");
-        const nextBtn = document.getElementById("nextBtn");
-        const progressBar = document.getElementById("progressBar");
-        const progressArea = document.getElementById("progressArea");
-        const currTimeEl = document.getElementById("currTime");
-        const totalTimeEl = document.getElementById("totalTime");
-        const searchInput = document.getElementById("searchInput");
-        const favFilterBtn = document.getElementById("favFilterBtn");
-        const themeFilter = document.getElementById("themeFilter");
+    <!-- Banner de Instalación -->
+        <div class="install-banner" id="installBanner">
+            <div class="install-banner-info">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="#f7d694">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                <div class="install-banner-text">Instalar App Himnario</div>
+            </div>
+            <div class="install-banner-actions">
+                <button class="btn-install" id="btnInstallApp">
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    <span>Instalar</span>
+                </button>
+                <button class="btn-close-banner" id="btnCloseBanner">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div> <!-- Cierre de player-container -->
 
-        // --- INICIALIZAR SELECT DE TEMAS MÚLTIPLES ---
-        function initThemeFilter() {
-            let allThemes = [];
-            // Extraer todos los temas de todas las canciones
-            songs.forEach(song => {
-                if (song.temas && Array.isArray(song.temas)) {
-                    allThemes = allThemes.concat(song.temas);
-                }
-            });
-            
-            // Eliminar duplicados y ordenar
-            const uniqueThemes = [...new Set(allThemes)].sort();
-            
-            uniqueThemes.forEach(tema => {
-                const option = document.createElement("option");
-                option.value = tema;
-                option.textContent = tema;
-                themeFilter.appendChild(option);
-            });
-        }
 
-        // --- Cierre global de menús y paneles ---
-        document.addEventListener('click', (e) => {
-            if (!textSizePanel.contains(e.target) && !textSizeBtn.contains(e.target)) {
-                textSizePanel.classList.remove('show');
-            }
-            
-            if (!e.target.closest('.song-actions-wrapper') && !e.target.closest('.more-options-btn')) {
-                document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
-                    el.classList.remove('show');
-                });
-            }
-        });
+ <!-- Llamar al archivo externo con las canciones -->
+    <script src="songs.js"></script>
+ 
+    <script>
+        const globalCoverUrl = "https://i.postimg.cc/14xJ49F9/LOGO-Himnario-Cristiano.png";
 
-        // --- Lógica del Botón de Ayuda / Soporte (MODAL) ---
-        const helpBtn = document.getElementById('helpBtn');
-        const helpModal = document.getElementById('helpModal');
-        const closeModalBtn = document.getElementById('closeModalBtn');
+        // YA NO ESTÁ AQUÍ EL ARREGLO 'songs', AHORA CARGA DESDE songs.js
+        
+        let songIndex = 0;
+        const audio = document.getElementById("mainAudioPlayer");
+        let isPlaying = false;
+        let showOnlyFavorites = false; 
 
-        helpBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            helpModal.classList.add('show');
-        });
+        const playlistEl = document.getElementById("playlistItems");
+        const coverEl = document.getElementById("cover");
+        const titleEl = document.getElementById("title");
+        const artistEl = document.getElementById("artist");
+        const playBtn = document.getElementById("playBtn");
+        const playIcon = document.getElementById("playIcon");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const progressBar = document.getElementById("progressBar");
+        const progressArea = document.getElementById("progressArea");
+        const currTimeEl = document.getElementById("currTime");
+        const totalTimeEl = document.getElementById("totalTime");
+        const searchInput = document.getElementById("searchInput");
+        const favFilterBtn = document.getElementById("favFilterBtn");
+        const themeFilter = document.getElementById("themeFilter");
 
-        closeModalBtn.addEventListener('click', () => {
-            helpModal.classList.remove('show');
-        });
+        // --- INICIALIZAR SELECT DE TEMAS MÚLTIPLES ---
+        function initThemeFilter() {
+            let allThemes = [];
+            // Extraer todos los temas de todas las canciones
+            songs.forEach(song => {
+                if (song.temas && Array.isArray(song.temas)) {
+                    allThemes = allThemes.concat(song.temas);
+                }
+            });
+            
+            // Eliminar duplicados y ordenar
+            const uniqueThemes = [...new Set(allThemes)].sort();
+            
+            uniqueThemes.forEach(tema => {
+                const option = document.createElement("option");
+                option.value = tema;
+                option.textContent = tema;
+                themeFilter.appendChild(option);
+            });
+        }
 
-        helpModal.addEventListener('click', (e) => {
-            if (e.target === helpModal) {
-                helpModal.classList.remove('show');
-            }
-        });
+        // --- Cierre global de menús y paneles ---
+        document.addEventListener('click', (e) => {
+            if (!textSizePanel.contains(e.target) && !textSizeBtn.contains(e.target)) {
+                textSizePanel.classList.remove('show');
+            }
+            
+            if (!e.target.closest('.song-actions-wrapper') && !e.target.closest('.more-options-btn')) {
+                document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
+                    el.classList.remove('show');
+                });
+            }
+        });
 
-        // --- LÓGICA DEL MODAL DE REFERENCIAS (MÚLTIPLES TEMAS) ---
-        const refModal = document.getElementById('refModal');
-        const closeRefModalBtn = document.getElementById('closeRefModalBtn');
-        const refModalTitle = document.getElementById('refModalTitle');
-        const refModalBody = document.getElementById('refModalBody');
+        // --- Lógica del Botón de Ayuda / Soporte (MODAL) ---
+        const helpBtn = document.getElementById('helpBtn');
+        const helpModal = document.getElementById('helpModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
 
-        window.openRefModal = function(event, index) {
-            event.stopPropagation();
-            
-            document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
-                el.classList.remove('show');
-            });
+        helpBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            helpModal.classList.add('show');
+        });
 
-            const song = songs[index];
-            refModalTitle.innerText = song.title;
-            
-            let html = '';
+        closeModalBtn.addEventListener('click', () => {
+            helpModal.classList.remove('show');
+        });
 
-            // Muestra los temas separados por coma
-            if (song.temas && song.temas.length > 0) {
-                html += `<div class="ref-theme-badge">Tema(s): <span>${song.temas.join(", ")}</span></div>`;
-            }
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                helpModal.classList.remove('show');
+            }
+        });
 
-            if (song.references && song.references.length > 0) {
-                html += '<ul class="ref-list">';
-                song.references.forEach(ref => {
-                    html += `
-                        <li class="ref-item">
-                            <span class="ref-hymnal">${ref.hymnal}</span>
-                            <span class="ref-number">#${ref.number}</span>
-                        </li>
-                    `;
-                });
-                html += '</ul>';
-            } else {
-                html += '<p style="text-align:center; padding: 20px 0; color: #b3b3b3;">No hay referencias a otros himnarios para esta canción.</p>';
-            }
+        // --- LÓGICA DEL MODAL DE REFERENCIAS (MÚLTIPLES TEMAS) ---
+        const refModal = document.getElementById('refModal');
+        const closeRefModalBtn = document.getElementById('closeRefModalBtn');
+        const refModalTitle = document.getElementById('refModalTitle');
+        const refModalBody = document.getElementById('refModalBody');
 
-            refModalBody.innerHTML = html;
-            refModal.classList.add('show');
-        };
+        window.openRefModal = function(event, index) {
+            event.stopPropagation();
+            
+            document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
+                el.classList.remove('show');
+            });
 
-        closeRefModalBtn.addEventListener('click', () => {
-            refModal.classList.remove('show');
-        });
+            const song = songs[index];
+            refModalTitle.innerText = song.title;
+            
+            let html = '';
 
-        refModal.addEventListener('click', (e) => {
-            if (e.target === refModal) {
-                refModal.classList.remove('show');
-            }
-        });
+            // Muestra los temas separados por coma
+            if (song.temas && song.temas.length > 0) {
+                html += `<div class="ref-theme-badge">Tema(s): <span>${song.temas.join(", ")}</span></div>`;
+            }
 
-        // --- LÓGICA DEL BOTÓN WHATSAPP DINÁMICO ---
-        const btnWhatsappContact = document.getElementById('btnWhatsappContact');
-        
-        btnWhatsappContact.addEventListener('click', () => {
-            let contactoWhatsapp = "51935180887"; 
-            contactoWhatsapp = contactoWhatsapp.replace('@', '');
+            if (song.references && song.references.length > 0) {
+                html += '<ul class="ref-list">';
+                song.references.forEach(ref => {
+                    html += `
+                        <li class="ref-item">
+                            <span class="ref-hymnal">${ref.hymnal}</span>
+                            <span class="ref-number">#${ref.number}</span>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+            } else {
+                html += '<p style="text-align:center; padding: 20px 0; color: #b3b3b3;">No hay referencias a otros himnarios para esta canción.</p>';
+            }
 
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            let whatsappUrl = "";
+            refModalBody.innerHTML = html;
+            refModal.classList.add('show');
+        };
 
-            if (isMobile) {
-                whatsappUrl = `https://api.whatsapp.com/send?phone=${contactoWhatsapp}`;
-            } else {
-                whatsappUrl = `https://web.whatsapp.com/send?phone=${contactoWhatsapp}`;
-            }
-            
-            window.open(whatsappUrl, '_blank');
-        });
+        closeRefModalBtn.addEventListener('click', () => {
+            refModal.classList.remove('show');
+        });
 
-        // --- Lógica del tamaño de texto ---
-        const textSizeBtn = document.getElementById('textSizeBtn');
-        const textSizePanel = document.getElementById('textSizePanel');
-        const fsDecrease = document.getElementById('fsDecrease');
-        const fsIncrease = document.getElementById('fsIncrease');
-        const fsDisplay = document.getElementById('fsDisplay');
-        const fsReset = document.getElementById('fsReset');
-        let currentTextScale = 100;
+        refModal.addEventListener('click', (e) => {
+            if (e.target === refModal) {
+                refModal.classList.remove('show');
+            }
+        });
 
-        textSizeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            textSizePanel.classList.toggle('show');
-        });
+        // --- LÓGICA DEL BOTÓN WHATSAPP DINÁMICO ---
+        const btnWhatsappContact = document.getElementById('btnWhatsappContact');
+        
+        btnWhatsappContact.addEventListener('click', () => {
+            let contactoWhatsapp = "51935180887"; 
+            contactoWhatsapp = contactoWhatsapp.replace('@', '');
 
-        function applyTextScale() {
-            document.documentElement.style.setProperty('--text-scale', currentTextScale / 100);
-            fsDisplay.innerText = `${currentTextScale}%`;
-        }
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            let whatsappUrl = "";
 
-        fsDecrease.addEventListener('click', () => {
-            if (currentTextScale > 60) {
-                currentTextScale -= 10;
-                applyTextScale();
-            }
-        });
+            if (isMobile) {
+                whatsappUrl = `https://api.whatsapp.com/send?phone=${contactoWhatsapp}`;
+            } else {
+                whatsappUrl = `https://web.whatsapp.com/send?phone=${contactoWhatsapp}`;
+            }
+            
+            window.open(whatsappUrl, '_blank');
+        });
 
-        fsIncrease.addEventListener('click', () => {
-            if (currentTextScale < 180) {
-                currentTextScale += 10;
-                applyTextScale();
-            }
-        });
+        // --- Lógica del tamaño de texto ---
+        const textSizeBtn = document.getElementById('textSizeBtn');
+        const textSizePanel = document.getElementById('textSizePanel');
+        const fsDecrease = document.getElementById('fsDecrease');
+        const fsIncrease = document.getElementById('fsIncrease');
+        const fsDisplay = document.getElementById('fsDisplay');
+        const fsReset = document.getElementById('fsReset');
+        let currentTextScale = 100;
 
-        fsReset.addEventListener('click', () => {
-            currentTextScale = 100;
-            applyTextScale();
-        });
+        textSizeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            textSizePanel.classList.toggle('show');
+        });
 
-        coverEl.src = globalCoverUrl;
-        const iconPlay = `<path d="M8 5v14l11-7z"/>`;
-        const iconPause = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
-        
-        // Íconos SVG
-        const iconDownloadSvg = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
-        const iconBookSvg = `<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>`;
-        const iconDotsSvg = `<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
+        function applyTextScale() {
+            document.documentElement.style.setProperty('--text-scale', currentTextScale / 100);
+            fsDisplay.innerText = `${currentTextScale}%`;
+        }
 
-        function formatDropboxStreamUrl(url) {
-            if(url.includes("dropbox.com")) {
-                return url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "").replace("?dl=1", "");
-            }
-            return url; 
-        }
+        fsDecrease.addEventListener('click', () => {
+            if (currentTextScale > 60) {
+                currentTextScale -= 10;
+                applyTextScale();
+            }
+        });
 
-        function formatDropboxDownloadUrl(url) {
-            if(url.includes("dropbox.com")) {
-                let cleanUrl = url.replace("?dl=0", "").replace("?dl=1", "");
-                return cleanUrl + (cleanUrl.includes("?") ? "&dl=1" : "?dl=1");
-            }
-            return url;
-        }
+        fsIncrease.addEventListener('click', () => {
+            if (currentTextScale < 180) {
+                currentTextScale += 10;
+                applyTextScale();
+            }
+        });
 
-        window.downloadSongFile = function(event, index) {
-            event.stopPropagation();
-            const song = songs[index];
-            const downloadUrl = formatDropboxDownloadUrl(song.src);
+        fsReset.addEventListener('click', () => {
+            currentTextScale = 100;
+            applyTextScale();
+        });
 
-            const a = document.createElement('a');
-            a.href = downloadUrl;
-            a.setAttribute('download', `${song.title}.mp3`);
-            a.target = '_blank';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        coverEl.src = globalCoverUrl;
+        const iconPlay = `<path d="M8 5v14l11-7z"/>`;
+        const iconPause = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+        
+        // Íconos SVG
+        const iconDownloadSvg = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+        const iconBookSvg = `<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>`;
+        const iconDotsSvg = `<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
 
-            localStorage.setItem('downloaded_' + song.src, 'true');
-            renderPlaylist(); 
-        }
+        function formatDropboxStreamUrl(url) {
+            if(url.includes("dropbox.com")) {
+                return url.replace("www.dropbox.com", "dl.dropboxusercontent.com").replace("?dl=0", "").replace("?dl=1", "");
+            }
+            return url; 
+        }
 
-        // --- LÓGICA DE FAVORITOS Y BÚSQUEDA ---
-        window.toggleFav = function(event, index) {
-            event.stopPropagation(); 
-            const song = songs[index];
-            const key = 'fav_' + song.src;
-            
-            if (localStorage.getItem(key) === 'true') {
-                localStorage.removeItem(key);
-            } else {
-                localStorage.setItem(key, 'true');
-            }
-            renderPlaylist(); 
-        }
+        function formatDropboxDownloadUrl(url) {
+            if(url.includes("dropbox.com")) {
+                let cleanUrl = url.replace("?dl=0", "").replace("?dl=1", "");
+                return cleanUrl + (cleanUrl.includes("?") ? "&dl=1" : "?dl=1");
+            }
+            return url;
+        }
 
-        favFilterBtn.addEventListener('click', () => {
-            showOnlyFavorites = !showOnlyFavorites;
-            if (showOnlyFavorites) {
-                favFilterBtn.classList.add('active');
-            } else {
-                favFilterBtn.classList.remove('active');
-            }
-            renderPlaylist();
-        });
+        window.downloadSongFile = function(event, index) {
+            event.stopPropagation();
+            const song = songs[index];
+            const downloadUrl = formatDropboxDownloadUrl(song.src);
 
-        searchInput.addEventListener("input", () => {
-            renderPlaylist();
-        });
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.setAttribute('download', `${song.title}.mp3`);
+            a.target = '_blank';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
 
-        themeFilter.addEventListener("change", () => {
-            renderPlaylist();
-        });
+            localStorage.setItem('downloaded_' + song.src, 'true');
+            renderPlaylist(); 
+        }
 
-        function getFilteredIndices() {
-            const query = searchInput.value.toLowerCase();
-            const selectedTheme = themeFilter.value;
-            let indices = [];
-            
-            songs.forEach((song, i) => {
-                const matchSearch = song.title.toLowerCase().includes(query) || song.artist.toLowerCase().includes(query);
-                
-                // Comprueba si el tema seleccionado está dentro del arreglo de temas de la canción
-                const matchTheme = selectedTheme === 'all' || (song.temas && song.temas.includes(selectedTheme));
-                
-                const isFav = localStorage.getItem('fav_' + song.src) === 'true';
+        // --- LÓGICA DE FAVORITOS Y BÚSQUEDA ---
+        window.toggleFav = function(event, index) {
+            event.stopPropagation(); 
+            const song = songs[index];
+            const key = 'fav_' + song.src;
+            
+            if (localStorage.getItem(key) === 'true') {
+                localStorage.removeItem(key);
+            } else {
+                localStorage.setItem(key, 'true');
+            }
+            renderPlaylist(); 
+        }
 
-                if (matchSearch && matchTheme) {
-                    if (!showOnlyFavorites || (showOnlyFavorites && isFav)) {
-                        indices.push(i);
-                    }
-                }
-            });
-            return indices;
-        }
+        favFilterBtn.addEventListener('click', () => {
+            showOnlyFavorites = !showOnlyFavorites;
+            if (showOnlyFavorites) {
+                favFilterBtn.classList.add('active');
+            } else {
+                favFilterBtn.classList.remove('active');
+            }
+            renderPlaylist();
+        });
 
-        // Activa/Desactiva el submenú en móviles
-        window.toggleOptionsMenu = function(event, index) {
-            event.stopPropagation();
-            document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
-                if (el.id !== `actions-${index}`) {
-                    el.classList.remove('show');
-                }
-            });
-            const wrapper = document.getElementById(`actions-${index}`);
-            wrapper.classList.toggle('show');
-        }
+        searchInput.addEventListener("input", () => {
+            renderPlaylist();
+        });
 
-        function renderPlaylist() {
-            playlistEl.innerHTML = "";
-            const filteredIndices = getFilteredIndices();
+        themeFilter.addEventListener("change", () => {
+            renderPlaylist();
+        });
 
-            filteredIndices.forEach((index) => {
-                const song = songs[index];
-                const item = document.createElement("div");
-                item.className = `playlist-item ${index === songIndex ? "active" : ""}`;
+        function getFilteredIndices() {
+            const query = searchInput.value.toLowerCase();
+            const selectedTheme = themeFilter.value;
+            let indices = [];
+            
+            songs.forEach((song, i) => {
+                const matchSearch = song.title.toLowerCase().includes(query) || song.artist.toLowerCase().includes(query);
+                
+                // Comprueba si el tema seleccionado está dentro del arreglo de temas de la canción
+                const matchTheme = selectedTheme === 'all' || (song.temas && song.temas.includes(selectedTheme));
+                
+                const isFav = localStorage.getItem('fav_' + song.src) === 'true';
 
-                const isDownloaded = localStorage.getItem('downloaded_' + song.src) === 'true';
-                const isFav = localStorage.getItem('fav_' + song.src) === 'true';
+                if (matchSearch && matchTheme) {
+                    if (!showOnlyFavorites || (showOnlyFavorites && isFav)) {
+                        indices.push(i);
+                    }
+                }
+            });
+            return indices;
+        }
 
-                const refButtonHtml = `
-                    <button class="action-btn" onclick="openRefModal(event, ${index})" title="Ver en otros Himnarios">
-                        ${iconBookSvg}
-                    </button>
-                `;
+        // Activa/Desactiva el submenú en móviles
+        window.toggleOptionsMenu = function(event, index) {
+            event.stopPropagation();
+            document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
+                if (el.id !== `actions-${index}`) {
+                    el.classList.remove('show');
+                }
+            });
+            const wrapper = document.getElementById(`actions-${index}`);
+            wrapper.classList.toggle('show');
+        }
 
-                const favButtonHtml = `
-                    <button class="action-btn fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${index})" title="Marcar como favorito">
-                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                        </svg>
-                    </button>
-                `;
+        function renderPlaylist() {
+            playlistEl.innerHTML = "";
+            const filteredIndices = getFilteredIndices();
 
-                const downloadButtonHtml = isDownloaded ? '' : `
-                    <button class="action-btn" onclick="downloadSongFile(event, ${index})" title="Descargar MP3">
-                        ${iconDownloadSvg}
-                    </button>
-                `;
+            filteredIndices.forEach((index) => {
+                const song = songs[index];
+                const item = document.createElement("div");
+                item.className = `playlist-item ${index === songIndex ? "active" : ""}`;
 
-                item.innerHTML = `
-                    <img src="${globalCoverUrl}" alt="cover">
-                    <div class="song-info-list" onclick="selectSong(${index})">
-                        <span class="song-title-list">${song.title}</span>
-                        <span class="song-artist-list">${song.artist}</span>
-                    </div>
-                    
-                    <div class="song-actions-wrapper" id="actions-${index}">
-                        ${refButtonHtml}
-                        ${favButtonHtml}
-                        ${downloadButtonHtml}
-                    </div>
-                    
-                    <button class="action-btn more-options-btn" onclick="toggleOptionsMenu(event, ${index})" title="Opciones">
-                        ${iconDotsSvg}
-                    </button>
-                `;
-                playlistEl.appendChild(item);
-            });
-        }
+                const isDownloaded = localStorage.getItem('downloaded_' + song.src) === 'true';
+                const isFav = localStorage.getItem('fav_' + song.src) === 'true';
 
-        // --- LÓGICA DEL REPRODUCTOR Y MEDIA SESSION PARA SEGUNDO PLANO ---
-        window.selectSong = function(index) {
-            songIndex = index;
-            loadSong(songs[songIndex]);
-            playSong();
-        }
+                const refButtonHtml = `
+                    <button class="action-btn" onclick="openRefModal(event, ${index})" title="Ver en otros Himnarios">
+                        ${iconBookSvg}
+                    </button>
+                `;
 
-        function updateMediaSession(song) {
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: song.title,
-                    artist: song.artist,
-                    album: "Himnario Cristiano",
-                    artwork: [{ src: globalCoverUrl, sizes: '512x512', type: 'image/png' }]
-                });
-                navigator.mediaSession.setActionHandler('play', playSong);
-                navigator.mediaSession.setActionHandler('pause', pauseSong);
-                navigator.mediaSession.setActionHandler('previoustrack', prevSong);
-                navigator.mediaSession.setActionHandler('nexttrack', nextSong);
-            }
-        }
+                const favButtonHtml = `
+                    <button class="action-btn fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(event, ${index})" title="Marcar como favorito">
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                    </button>
+                `;
 
-        function loadSong(song) {
-            titleEl.innerText = song.title;
-            artistEl.innerText = song.artist;
-            audio.src = formatDropboxStreamUrl(song.src);
-            renderPlaylist(); 
-            updateMediaSession(song);
-        }
+                const downloadButtonHtml = isDownloaded ? '' : `
+                    <button class="action-btn" onclick="downloadSongFile(event, ${index})" title="Descargar MP3">
+                        ${iconDownloadSvg}
+                    </button>
+                `;
 
-        function playSong() {
+                item.innerHTML = `
+                    <img src="${globalCoverUrl}" alt="cover">
+                    <div class="song-info-list" onclick="selectSong(${index})">
+                        <span class="song-title-list">${song.title}</span>
+                        <span class="song-artist-list">${song.artist}</span>
+                    </div>
+                    
+                    <div class="song-actions-wrapper" id="actions-${index}">
+                        ${refButtonHtml}
+                        ${favButtonHtml}
+                        ${downloadButtonHtml}
+                    </div>
+                    
+                    <button class="action-btn more-options-btn" onclick="toggleOptionsMenu(event, ${index})" title="Opciones">
+                        ${iconDotsSvg}
+                    </button>
+                `;
+                playlistEl.appendChild(item);
+            });
+        }
+
+        // --- LÓGICA DEL REPRODUCTOR Y MEDIA SESSION PARA SEGUNDO PLANO ---
+        window.selectSong = function(index) {
+            songIndex = index;
+            loadSong(songs[songIndex]);
+            playSong();
+        }
+
+        function updateMediaSession(song) {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: song.title,
+                    artist: song.artist,
+                    album: "Himnario Cristiano",
+                    artwork: [{ src: globalCoverUrl, sizes: '512x512', type: 'image/png' }]
+                });
+                navigator.mediaSession.setActionHandler('play', playSong);
+                navigator.mediaSession.setActionHandler('pause', pauseSong);
+                navigator.mediaSession.setActionHandler('previoustrack', prevSong);
+                navigator.mediaSession.setActionHandler('nexttrack', nextSong);
+            }
+        }
+
+        function loadSong(song) {
+            titleEl.innerText = song.title;
+            artistEl.innerText = song.artist;
+            audio.src = formatDropboxStreamUrl(song.src);
+            renderPlaylist(); 
+            updateMediaSession(song);
+        }
+
+        function playSong() {
             isPlaying = true;
             playIcon.innerHTML = iconPause;
             
@@ -1305,139 +1311,120 @@
             coverEl.style.animationPlayState = "paused";
         }
 
-        function prevSong() {
-            const filtered = getFilteredIndices();
-            if(filtered.length === 0) return; 
+        function prevSong() {
+            const filtered = getFilteredIndices();
+            if(filtered.length === 0) return; 
 
-            const currentIdxInFiltered = filtered.indexOf(songIndex);
-            
-            if (currentIdxInFiltered === -1) {
-                songIndex = filtered[0];
-            } else {
-                songIndex = filtered[(currentIdxInFiltered - 1 + filtered.length) % filtered.length];
-            }
-            
-            loadSong(songs[songIndex]);
-            if (isPlaying) playSong();
-        }
+            const currentIdxInFiltered = filtered.indexOf(songIndex);
+            
+            if (currentIdxInFiltered === -1) {
+                songIndex = filtered[0];
+            } else {
+                songIndex = filtered[(currentIdxInFiltered - 1 + filtered.length) % filtered.length];
+            }
+            
+            loadSong(songs[songIndex]);
+            if (isPlaying) playSong();
+        }
 
-        function nextSong() {
-            const filtered = getFilteredIndices();
-            if(filtered.length === 0) return;
+        function nextSong() {
+            const filtered = getFilteredIndices();
+            if(filtered.length === 0) return;
 
-            const currentIdxInFiltered = filtered.indexOf(songIndex);
-            
-            if (currentIdxInFiltered === -1) {
-                songIndex = filtered[0];
-            } else {
-                songIndex = filtered[(currentIdxInFiltered + 1) % filtered.length];
-            }
+            const currentIdxInFiltered = filtered.indexOf(songIndex);
+            
+            if (currentIdxInFiltered === -1) {
+                songIndex = filtered[0];
+            } else {
+                songIndex = filtered[(currentIdxInFiltered + 1) % filtered.length];
+            }
 
-            loadSong(songs[songIndex]);
-            if (isPlaying) playSong();
-        }
+            loadSong(songs[songIndex]);
+            if (isPlaying) playSong();
+        }
 
-        prevBtn.addEventListener("click", prevSong);
-        nextBtn.addEventListener("click", nextSong);
-        audio.addEventListener("ended", nextSong); 
+        prevBtn.addEventListener("click", prevSong);
+        nextBtn.addEventListener("click", nextSong);
+        audio.addEventListener("ended", nextSong); 
 
-        audio.addEventListener("timeupdate", (e) => {
-            const { currentTime, duration } = e.srcElement;
-            if (!isNaN(duration)) {
-                const progressPercent = (currentTime / duration) * 100;
-                progressBar.style.width = `${progressPercent}%`;
+        audio.addEventListener("timeupdate", (e) => {
+            const { currentTime, duration } = e.srcElement;
+            if (!isNaN(duration)) {
+                const progressPercent = (currentTime / duration) * 100;
+                progressBar.style.width = `${progressPercent}%`;
 
-                let currMins = Math.floor(currentTime / 60);
-                let currSecs = Math.floor(currentTime % 60);
-                currSecs = currSecs < 10 ? `0${currSecs}` : currSecs;
-                currTimeEl.innerText = `${currMins}:${currSecs}`;
+                let currMins = Math.floor(currentTime / 60);
+                let currSecs = Math.floor(currentTime % 60);
+                currSecs = currSecs < 10 ? `0${currSecs}` : currSecs;
+                currTimeEl.innerText = `${currMins}:${currSecs}`;
 
-                let totMins = Math.floor(duration / 60);
-                let totSecs = Math.floor(duration % 60);
-                totSecs = totSecs < 10 ? `0${totSecs}` : totSecs;
-                totalTimeEl.innerText = `${totMins}:${totSecs}`;
-            }
-        });
+                let totMins = Math.floor(duration / 60);
+                let totSecs = Math.floor(duration % 60);
+                totSecs = totSecs < 10 ? `0${totSecs}` : totSecs;
+                totalTimeEl.innerText = `${totMins}:${totSecs}`;
+            }
+        });
 
-        progressArea.addEventListener("click", (e) => {
-            const width = progressArea.clientWidth;
-            const clickX = e.offsetX;
-            const duration = audio.duration;
-            audio.currentTime = (clickX / width) * duration;
-        });
+        progressArea.addEventListener("click", (e) => {
+            const width = progressArea.clientWidth;
+            const clickX = e.offsetX;
+            const duration = audio.duration;
+            audio.currentTime = (clickX / width) * duration;
+        });
 
-        // Inicializar Filtros
-        initThemeFilter();
-        
-        // Inicializar reproductor
-        loadSong(songs[songIndex]);
-// Mantener viva la sesión multimedia si hay micro-cortes de internet
-        audio.addEventListener("playing", () => {
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.playbackState = "playing";
-            }
-        });
+        // Inicializar Filtros
+        initThemeFilter();
+        
+        // Inicializar reproductor
+        loadSong(songs[songIndex]);
+    </script>
 
-        audio.addEventListener("pause", () => {
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.playbackState = "paused";
-            }
-        });
+    <script>
+        // --- REGISTRO DEL SERVICE WORKER PARA PWA ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(registration => console.log('ServiceWorker registrado:', registration.scope))
+                    .catch(error => console.log('Fallo ServiceWorker:', error));
+            });
+        }
 
-        audio.addEventListener("waiting", () => {
-            // Le decimos al SO que seguimos reproduciendo, solo estamos cargando (buffering)
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.playbackState = "playing"; 
-            }
-        });
-		
-    </script>
-<script>
-        // --- REGISTRO DEL SERVICE WORKER PARA PWA ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => console.log('ServiceWorker registrado:', registration.scope))
-                    .catch(error => console.log('Fallo ServiceWorker:', error));
-            });
-        }
+        // --- LÓGICA DEL BANNER DE INSTALACIÓN PWA ---
+        let deferredPrompt;
+        const installBanner = document.getElementById('installBanner');
+        const btnInstallApp = document.getElementById('btnInstallApp');
+        const btnCloseBanner = document.getElementById('btnCloseBanner');
 
-        // --- LÓGICA DEL BANNER DE INSTALACIÓN PWA ---
-        let deferredPrompt;
-        const installBanner = document.getElementById('installBanner');
-        const btnInstallApp = document.getElementById('btnInstallApp');
-        const btnCloseBanner = document.getElementById('btnCloseBanner');
+        // Escucha el evento que detecta si la app se puede instalar
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault(); // Evita que Chrome muestre el prompt automático
+            deferredPrompt = e; // Guarda el evento
+            installBanner.classList.add('show'); // Muestra nuestro banner personalizado
+        });
 
-        // Escucha el evento que detecta si la app se puede instalar
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); // Evita que Chrome muestre el prompt automático
-            deferredPrompt = e; // Guarda el evento
-            installBanner.classList.add('show'); // Muestra nuestro banner personalizado
-        });
+        // Acción al hacer clic en instalar
+        btnInstallApp.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                installBanner.classList.remove('show');
+                deferredPrompt.prompt(); // Muestra el mensaje nativo de instalación del sistema
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('App instalada');
+                }
+                deferredPrompt = null;
+            }
+        });
 
-        // Acción al hacer clic en instalar
-        btnInstallApp.addEventListener('click', async () => {
-            if (deferredPrompt) {
-                installBanner.classList.remove('show');
-                deferredPrompt.prompt(); // Muestra el mensaje nativo de instalación del sistema
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    console.log('App instalada');
-                }
-                deferredPrompt = null;
-            }
-        });
+        // Acción al cerrar el banner
+        btnCloseBanner.addEventListener('click', () => {
+            installBanner.classList.remove('show');
+        });
 
-        // Acción al cerrar el banner
-        btnCloseBanner.addEventListener('click', () => {
-            installBanner.classList.remove('show');
-        });
-
-        // Si ya se instaló, ocultar el banner por seguridad
-        window.addEventListener('appinstalled', () => {
-            installBanner.classList.remove('show');
-            deferredPrompt = null;
-        });
-    </script>
+        // Si ya se instaló, ocultar el banner por seguridad
+        window.addEventListener('appinstalled', () => {
+            installBanner.classList.remove('show');
+            deferredPrompt = null;
+        });
+    </script>
 </body>
 </html>
