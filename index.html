@@ -1325,39 +1325,42 @@
             updateMediaSession(song);
         }
 
-        async function playSong() {
-            if (!audio.src) return;
+        function playSong() {
+            isPlaying = true;
+            playIcon.innerHTML = iconPause;
+            
+            // 1. ACTIVAR AUTOPLAY: Esto fuerza al navegador a cargar y reproducir 
+            // la siguiente pista nativamente sin que el sistema operativo lo bloquee.
+            audio.autoplay = true; 
 
-            intentionalPause = false;
-            const requestId = ++playRequestId;
-
-            try {
-                // play() debe ejecutarse como consecuencia de una acción del usuario
-                // cuando el navegador exija una interacción previa.
-                await audio.play();
-
-                // Ignora una promesa antigua si el usuario cambió de himno rápidamente.
-                if (requestId !== playRequestId) return;
-
-                isBuffering = false;
-                updatePlayButton(true);
-                setMediaPlaybackState('playing');
-            } catch (error) {
-                if (requestId !== playRequestId) return;
-
-                updatePlayButton(false);
-                setMediaPlaybackState('paused');
-                console.debug('La reproducción requiere interacción del usuario:', error);
+            // 2. AVISAR AL SO INMEDIATAMENTE: No esperamos a que el audio cargue.
+            // Reclamamos el widget al instante para que no desaparezca.
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = "playing"; 
             }
+            
+            audio.play().catch(e => {
+                console.log("El sistema retrasó el autoplay: ", e);
+                // Si el SO bloquea temporalmente, no cambiamos la UI a "pausa".
+                // Dejamos que los eventos 'waiting' o 'playing' (que ya pusiste) lo resuelvan.
+            });
+            
+            coverEl.style.animationPlayState = "running";
         }
 
         function pauseSong() {
-            intentionalPause = true;
-            ++playRequestId;
+            isPlaying = false;
+            playIcon.innerHTML = iconPlay;
+            
+            // DESACTIVAR AUTOPLAY: Para que no salte de canción si lo pausamos manualmente
+            audio.autoplay = false; 
             audio.pause();
-            isBuffering = false;
-            updatePlayButton(false);
-            setMediaPlaybackState('paused');
+            
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.playbackState = "paused";
+            }
+            
+            coverEl.style.animationPlayState = "paused";
         }
 
         function seekBy(seconds) {
