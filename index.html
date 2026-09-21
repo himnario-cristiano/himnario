@@ -45,7 +45,6 @@
             overflow: hidden;
         }
 
-        /* Motores de audio invisibles, pero activos para reproducción en segundo plano */
         .audio-engine {
             position: fixed;
             width: 1px;
@@ -59,7 +58,6 @@
             margin: 0;
         }
 
-        /* Reproductor Superior */
         .now-playing { 
             background: #121212; 
             padding: 15px 20px; 
@@ -79,7 +77,6 @@
             position: relative;
         }
 
-        /* Contenedor de Botones Superior Derecho */
         .top-right-actions {
             position: absolute;
             top: 1px; 
@@ -163,7 +160,6 @@
         }
         #fsReset:hover { background: #4f4f4f; color: #fff; }
 
-        /* Vinilo compacto arriba */
         .vinyl-wrapper { 
             position: relative; 
             width: 80px; 
@@ -295,7 +291,6 @@
 
         .btn-play svg { width: 22px; height: 22px; }
 
-        /* Contenedor Principal de la Lista de reproducción */
         .playlist { 
             flex: 1; 
             background: #181818; 
@@ -305,7 +300,6 @@
             overflow: hidden; 
         }
 
-        /* Header de la lista */
         .playlist-header {
             width: 100%;
             display: flex;
@@ -350,7 +344,6 @@
 
         .search-input::placeholder { color: #888; }
 
-        /* Select de Temas */
         .theme-select {
             background: #282828;
             color: #b3b3b3;
@@ -392,7 +385,6 @@
         .fav-filter-btn.active { color: #f7d694; }
         .fav-filter-btn.active svg { fill: #f7d694; }
 
-        /* Contenedor de los items */
         .playlist-items-container {
             width: 100%;
             flex: 1;
@@ -454,13 +446,11 @@
             transition: font-size 0.2s;
         }
 
-        /* Envoltorio de las acciones del track */
         .song-actions-wrapper {
             display: flex;
             align-items: center;
         }
         
-        /* Botones de acción base */
         .action-btn {
             background: none;
             border: none;
@@ -493,7 +483,6 @@
         ::-webkit-scrollbar-thumb { background: #4f4f4f; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #f7d694; }
 
-        /* Estilos del Modal Base */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -561,7 +550,6 @@
             line-height: 1.6;
         }
         
-        /* Estilos específicos para el Modal de Referencias y Tema */
         .ref-theme-badge {
             font-size: 13px;
             color: #b3b3b3;
@@ -635,12 +623,10 @@
             transform: scale(1.02);
         }
 
-        /* --- RESPONSIVE: COMPORTAMIENTO MÓVIL --- */
         @media (max-width: 480px) {
             .vinyl-wrapper { width: 65px; height: 65px; }
             .title-current { font-size: calc(15px * var(--text-scale)); }
             
-            /* Ajustes del Header de Playlist en Móvil */
             .playlist-header { 
                 padding: 15px 10px 10px 10px; 
                 flex-wrap: wrap; 
@@ -667,7 +653,6 @@
 
             .action-btn svg { width: 18px; height: 18px; }
             
-            /* Ocultamos los botones y mostramos los 3 puntos */
             button.action-btn.more-options-btn {
                 display: flex; 
             }
@@ -698,7 +683,6 @@
             to { opacity: 1; transform: translate(0, -50%); }
         }
 
-        /* --- BANNER DE INSTALACIÓN PWA --- */
         .install-banner {
             position: fixed;
             bottom: 0;
@@ -770,7 +754,6 @@
     </style>
 </head>
 <body>
-    <!-- Banner de Instalación -->
     <div class="install-banner" id="installBanner">
         <div class="install-banner-info">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="#f7d694">
@@ -789,17 +772,13 @@
         </div>
     </div>
     
-    <!-- SISTEMA DUAL DE AUDIO PARA REPRODUCCIÓN EN SEGUNDO PLANO -->
-    <!-- No usamos display:none para evitar que algunos navegadores móviles traten el
-         elemento de audio como inactivo al pasar la aplicación a segundo plano. -->
+    <!-- SISTEMA ÚNICO DE AUDIO. Eliminar el audioPlayer2 evita bloqueos del MediaSession en iOS y Android. -->
     <audio id="audioPlayer1" class="audio-engine" preload="auto" playsinline webkit-playsinline></audio>
-    <audio id="audioPlayer2" class="audio-engine" preload="auto" playsinline webkit-playsinline></audio>
 
     <div class="player-container">
         <!-- Reproductor Superior -->
         <div class="now-playing" id="nowPlaying">
             
-            <!-- Contenedor de Botones Superior Derecho -->
             <div class="top-right-actions">
                 <button class="btn-action" id="helpBtn" title="Soporte y Ayuda">
                     <svg viewBox="0 0 24 24">
@@ -814,7 +793,6 @@
                 </button>
             </div>
             
-            <!-- Panel de control de tamaño de texto -->
             <div class="font-size-panel" id="textSizePanel">
                 <div class="fs-row">
                     <button id="fsDecrease">-</button>
@@ -859,7 +837,6 @@
             </div>
         </div>
 
-        <!-- Lista de reproducción -->
         <div class="playlist">
             <div class="playlist-header">
                 <div class="search-container">
@@ -884,7 +861,7 @@
         </div>
     </div>
 
-    <!-- Modal de Ayuda y Soporte -->
+    <!-- Modales -->
     <div class="modal-overlay" id="helpModal">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn">&times;</button>
@@ -901,7 +878,6 @@
         </div>
     </div>
 
-    <!-- Modal de Referencias a otros Himnarios -->
     <div class="modal-overlay" id="refModal">
         <div class="modal-content">
             <button class="modal-close" id="closeRefModalBtn">&times;</button>
@@ -913,14 +889,10 @@
     <script src="songs.js"></script>
     
     <script>
-        // --- SISTEMA DE AUDIO DUAL & DESBLOQUEO GLOBAL ---
+        // --- SISTEMA DE AUDIO ÚNICO CORREGIDO PARA SEGUNDO PLANO ---
         let activeAudio = document.getElementById("audioPlayer1");
-        let nextAudio = document.getElementById("audioPlayer2");
-        let upcomingSongIndex = 0;
         let isGlobalAudioUnlocked = false;
 
-        // Estado de reproducción en segundo plano.
-        // Si el usuario pulsa Pausa, no intentamos reanudar.
         let backgroundPlaybackExpected = false;
         let backgroundRecoveryTimer = null;
 
@@ -931,7 +903,6 @@
                 Notification.requestPermission().catch(() => {});
             }
 
-            // Desbloqueo inicial dentro de una interacción del usuario.
             const unlockAudio = (audio) => {
                 try {
                     const promise = audio.play();
@@ -942,8 +913,6 @@
             };
 
             unlockAudio(activeAudio);
-            unlockAudio(nextAudio);
-
             isGlobalAudioUnlocked = true;
             document.removeEventListener('click', initializeGlobalPermissions);
             document.removeEventListener('touchstart', initializeGlobalPermissions);
@@ -1000,7 +969,6 @@
                 modeBtn.classList.add('active-mode');
                 modeBtn.title = "Orden aleatorio";
             }
-            preloadNext(); // Recalcular la siguiente canción a precargar al cambiar de modo
         });
 
         const iconDownloadSvg = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
@@ -1031,7 +999,6 @@
             }
         });
 
-        // Modales y Controles de Tamaño (Se mantiene tu código original)
         const helpBtn = document.getElementById('helpBtn');
         const helpModal = document.getElementById('helpModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -1190,25 +1157,14 @@
             });
         }
 
-
-        // --- LÓGICA DE REPRODUCCIÓN DUAL ---
-        
         function getUpcomingIndex(currentIndex) {
             const filtered = getFilteredIndices();
             if (filtered.length === 0) return currentIndex;
-            if (playbackMode === 1) return currentIndex; // Repetir actual
-            if (playbackMode === 2) return filtered[Math.floor(Math.random() * filtered.length)]; // Aleatorio
+            if (playbackMode === 1) return currentIndex; 
+            if (playbackMode === 2) return filtered[Math.floor(Math.random() * filtered.length)]; 
             
             const currentIdxInFiltered = filtered.indexOf(currentIndex);
             return currentIdxInFiltered === -1 ? filtered[0] : filtered[(currentIdxInFiltered + 1) % filtered.length];
-        }
-
-        function preloadNext() {
-            upcomingSongIndex = getUpcomingIndex(songIndex);
-            if (songs[upcomingSongIndex]) {
-                nextAudio.src = formatDropboxStreamUrl(songs[upcomingSongIndex].src);
-                nextAudio.load(); 
-            }
         }
 
         window.selectSong = function(index) {
@@ -1225,7 +1181,6 @@
             activeAudio.src = formatDropboxStreamUrl(song.src);
             backgroundPlaybackExpected = true;
             requestAudioPlay(activeAudio);
-            preloadNext(); 
         };
 
         function safeMediaAction(action, handler) {
@@ -1282,7 +1237,6 @@
 
         function requestAudioPlay(audio = activeAudio) {
             if (!audio) return Promise.resolve(false);
-
             try {
                 const promise = audio.play();
                 if (promise && typeof promise.then === "function") {
@@ -1323,17 +1277,10 @@
             activeAudio.currentTime = Math.max(0, Math.min(activeAudio.duration, activeAudio.currentTime + seconds));
         }
 
-        /*
-         * Recuperación de una pausa accidental provocada por el navegador.
-         * La pausa intencional del usuario siempre tiene prioridad.
-         */
         function recoverBackgroundPlayback() {
             if (!backgroundPlaybackExpected || intentionalPause || !isPlaying) return;
             if (!activeAudio || activeAudio.ended) return;
-
-            if (activeAudio.paused) {
-                requestAudioPlay(activeAudio);
-            }
+            if (activeAudio.paused) requestAudioPlay(activeAudio);
 
             playIcon.innerHTML = iconPause;
             coverEl.style.animationPlayState = "running";
@@ -1342,12 +1289,8 @@
 
         function startBackgroundRecoveryWatchdog() {
             if (backgroundRecoveryTimer) clearInterval(backgroundRecoveryTimer);
-
             backgroundRecoveryTimer = setInterval(() => {
                 if (!backgroundPlaybackExpected || intentionalPause || !isPlaying) return;
-
-                // Solo vigilamos activamente cuando la página está visible.
-                // Con pantalla bloqueada dejamos trabajar al motor nativo de audio.
                 if (!document.hidden && activeAudio.paused && !activeAudio.ended) {
                     recoverBackgroundPlayback();
                 }
@@ -1370,64 +1313,37 @@
                 setTimeout(recoverBackgroundPlayback, 100);
             }
         });
-
         window.addEventListener("focus", () => {
             if (backgroundPlaybackExpected && !intentionalPause) {
                 setTimeout(recoverBackgroundPlayback, 100);
             }
         });
-
         window.addEventListener("online", () => {
-            if (backgroundPlaybackExpected && !intentionalPause &&
-                activeAudio.paused && !activeAudio.ended) {
+            if (backgroundPlaybackExpected && !intentionalPause && activeAudio.paused && !activeAudio.ended) {
                 setTimeout(recoverBackgroundPlayback, 300);
             }
         });
 
-        // ================================================================
-        // COMPATIBILIDAD ANDROID + iPHONE/iPAD
-        // ================================================================
-        // No pausamos el <audio> al ocultar la página. En Android Chrome y
-        // en Safari/iOS el motor multimedia del sistema debe quedarse con
-        // el audio para que continúe con pantalla bloqueada.
         document.addEventListener("pagehide", () => {
-            // pagehide NO significa pausa del usuario. Conservamos el estado.
             if (isPlaying && !intentionalPause && !activeAudio.ended) {
                 backgroundPlaybackExpected = true;
                 setMediaPlaybackState("playing");
             }
         });
-
-        window.addEventListener("pageshow", () => {
-            if (backgroundPlaybackExpected && !intentionalPause && !activeAudio.ended) {
-                setMediaPlaybackState("playing");
-                if (!document.hidden && activeAudio.paused) {
-                    setTimeout(recoverBackgroundPlayback, 150);
-                }
-            }
-        });
-
-        // Android Chrome / algunos navegadores basados en Chromium.
         document.addEventListener("freeze", () => {
             if (isPlaying && !intentionalPause && !activeAudio.ended) {
                 backgroundPlaybackExpected = true;
                 setMediaPlaybackState("playing");
             }
         });
-
         document.addEventListener("resume", () => {
             if (backgroundPlaybackExpected && !intentionalPause && !activeAudio.ended) {
                 setMediaPlaybackState("playing");
                 if (activeAudio.paused) setTimeout(recoverBackgroundPlayback, 100);
             }
         });
-
-        // Si el sistema pierde temporalmente la red al bloquear/desbloquear,
-        // esperamos a que vuelva antes de intentar recuperar el audio.
         window.addEventListener("offline", () => {
-            if (isPlaying && !intentionalPause) {
-                backgroundPlaybackExpected = true;
-            }
+            if (isPlaying && !intentionalPause) backgroundPlaybackExpected = true;
         });
 
         startBackgroundRecoveryWatchdog();
@@ -1454,20 +1370,14 @@
             activeAudio.src = formatDropboxStreamUrl(song.src);
             backgroundPlaybackExpected = true;
             requestAudioPlay(activeAudio);
-            preloadNext();
         }
 
-        // Esta función ejecuta el cambio INMEDIATO a la canción pre-cargada
+        // --- SISTEMA CORREGIDO ---
         function transitionToNext(manualClick = false) {
             const filtered = getFilteredIndices();
             if (filtered.length === 0) return;
 
-            // Intercambiar variables de reproductores (el oculto pasa a ser el principal)
-            let temp = activeAudio;
-            activeAudio = nextAudio;
-            nextAudio = temp;
-
-            songIndex = upcomingSongIndex;
+            songIndex = getUpcomingIndex(songIndex);
             const song = songs[songIndex];
 
             titleEl.innerText = song.title || 'Sin título';
@@ -1475,20 +1385,19 @@
             renderPlaylist();
             updateMediaSession(song);
 
-            // Si llegamos aquí por el final de una canción (manualClick=true)
-            // SIEMPRE arrancamos el siguiente audio. Esto evita que un 'pause'
-            // interno del navegador impida la reproducción automática.
+            // Reutilizar EXACTAMENTE el mismo reproductor mantiene viva la MediaSession con la pantalla apagada
+            activeAudio.src = formatDropboxStreamUrl(song.src);
+            activeAudio.load(); 
+
             if (isPlaying || manualClick) {
                 isPlaying = true;
                 intentionalPause = false;
                 backgroundPlaybackExpected = true;
                 updatePlayButton(true);
                 setMediaPlaybackState('playing');
-                requestAudioPlay(activeAudio);
+                // Esto obliga a iniciar síncronamente respetando el control en segundo plano del SO
+                requestAudioPlay(activeAudio); 
             }
-            
-            // Preparar en las sombras la canción que sigue a esta
-            preloadNext();
         }
 
         prevBtn.addEventListener('click', prevSong);
@@ -1502,15 +1411,8 @@
             activeAudio.currentTime = ratio * activeAudio.duration;
         });
 
-        // Eventos a ambos reproductores para no perder el tracking tras los intercambios
         function setupAudioListeners(audioElement) {
             audioElement.addEventListener('ended', (e) => {
-                if (e.target !== activeAudio) return; // Ignoramos si el que acaba es el preloader oculto
-
-                // REPRODUCCIÓN AUTOMÁTICA OBLIGATORIA:
-                // cuando una canción termina, pasamos al siguiente y lo
-                // reproducimos aunque el navegador haya cambiado el estado
-                // de isPlaying durante el evento 'ended'.
                 if (songs.length > 0) {
                     backgroundPlaybackExpected = true;
                     intentionalPause = false;
@@ -1520,7 +1422,6 @@
             });
 
             audioElement.addEventListener('timeupdate', (e) => {
-                if (e.target !== activeAudio) return; 
                 const { currentTime, duration } = e.target;
                 if (!Number.isFinite(duration) || duration <= 0) return;
                 const progressPercent = Math.min(100, Math.max(0, (currentTime / duration) * 100));
@@ -1538,7 +1439,6 @@
             });
 
             audioElement.addEventListener('playing', (e) => {
-                if (e.target !== activeAudio) return;
                 isBuffering = false;
                 intentionalPause = false;
                 backgroundPlaybackExpected = true;
@@ -1547,7 +1447,6 @@
             });
 
             audioElement.addEventListener('play', (e) => {
-                if (e.target !== activeAudio) return;
                 if (!intentionalPause) {
                     backgroundPlaybackExpected = true;
                     updatePlayButton(true);
@@ -1556,47 +1455,29 @@
             });
 
             audioElement.addEventListener('pause', (e) => {
-                if (e.target !== activeAudio) return;
-
                 if (isBuffering && !intentionalPause) return;
-
-                // Pausa hecha por el usuario: se respeta.
                 if (intentionalPause) {
                     backgroundPlaybackExpected = false;
                     updatePlayButton(false);
                     setMediaPlaybackState('paused');
                     return;
                 }
-
-                /*
-                 * Si el sistema provoca una pausa temporal mientras seguimos
-                 * esperando reproducción, no la tratamos como pausa intencional.
-                 */
                 if (backgroundPlaybackExpected && !activeAudio.ended) {
                     updatePlayButton(true);
                     setMediaPlaybackState('playing');
-
-                    // En primer plano podemos recuperar inmediatamente.
-                    // En pantalla bloqueada el elemento <audio> queda a cargo
-                    // del motor multimedia del navegador/sistema.
-                    if (!document.hidden) {
-                        setTimeout(recoverBackgroundPlayback, 50);
-                    }
+                    if (!document.hidden) setTimeout(recoverBackgroundPlayback, 50);
                     return;
                 }
-
                 updatePlayButton(false);
             });
 
             audioElement.addEventListener('waiting', (e) => {
-                if (e.target !== activeAudio) return;
                 if (!intentionalPause && !activeAudio.ended) {
                     isBuffering = true; updatePlayButton(true); setMediaPlaybackState('playing');
                 }
             });
 
             audioElement.addEventListener('canplay', (e) => {
-                if (e.target !== activeAudio) return;
                 if (isBuffering && !intentionalPause) {
                     isBuffering = false; setMediaPlaybackState('playing');
                     if (activeAudio.paused) playSong();
@@ -1605,10 +1486,7 @@
         }
 
         setupAudioListeners(activeAudio);
-        setupAudioListeners(nextAudio);
-        startBackgroundRecoveryWatchdog();
 
-        // Inicialización de arranque
         function initPlayer() {
             initThemeFilter();
             if (songs.length > 0) {
@@ -1618,11 +1496,9 @@
                 activeAudio.src = formatDropboxStreamUrl(song.src);
                 renderPlaylist();
                 updateMediaSession(song);
-                preloadNext(); 
             }
         }
         initPlayer();
-        
     </script>
     
     <script>
