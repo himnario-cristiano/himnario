@@ -42,6 +42,20 @@
             overflow: hidden;
         }
 
+        /* Motores de audio invisibles, pero activos para reproducción en segundo plano */
+        .audio-engine {
+            position: fixed;
+            width: 1px;
+            height: 1px;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0.01;
+            pointer-events: none;
+            border: 0;
+            padding: 0;
+            margin: 0;
+        }
+
         /* Reproductor Superior */
         .now-playing { 
             background: #121212; 
@@ -772,9 +786,11 @@
         </div>
     </div>
     
-    <!-- SISTEMA DUAL DE AUDIO PARA EVITAR CIERRE EN SEGUNDO PLANO -->
-    <audio id="audioPlayer1" preload="auto" playsinline style="display: none;"></audio>
-    <audio id="audioPlayer2" preload="auto" playsinline style="display: none;"></audio>
+    <!-- SISTEMA DUAL DE AUDIO PARA REPRODUCCIÓN EN SEGUNDO PLANO -->
+    <!-- No usamos display:none para evitar que algunos navegadores móviles traten el
+         elemento de audio como inactivo al pasar la aplicación a segundo plano. -->
+    <audio id="audioPlayer1" class="audio-engine" preload="auto" playsinline webkit-playsinline></audio>
+    <audio id="audioPlayer2" class="audio-engine" preload="auto" playsinline webkit-playsinline></audio>
 
     <div class="player-container">
         <!-- Reproductor Superior -->
@@ -900,20 +916,34 @@
         let upcomingSongIndex = 0;
         let isGlobalAudioUnlocked = false;
 
+        // Estado de reproducción en segundo plano.
+        // Si el usuario pulsa Pausa, no intentamos reanudar.
+        let backgroundPlaybackExpected = false;
+        let backgroundRecoveryTimer = null;
+
         function initializeGlobalPermissions() {
             if (isGlobalAudioUnlocked) return;
-            
+
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission().catch(() => {});
             }
 
-            // Desbloqueamos ambos reproductores para garantizar flujo sin restricciones
-            activeAudio.play().then(() => activeAudio.pause()).catch(() => {});
-            nextAudio.play().then(() => nextAudio.pause()).catch(() => {});
+            // Desbloqueo inicial dentro de una interacción del usuario.
+            const unlockAudio = (audio) => {
+                try {
+                    const promise = audio.play();
+                    if (promise && typeof promise.then === "function") {
+                        promise.then(() => audio.pause()).catch(() => {});
+                    }
+                } catch (e) {}
+            };
 
+            unlockAudio(activeAudio);
+            unlockAudio(nextAudio);
+
+            isGlobalAudioUnlocked = true;
             document.removeEventListener('click', initializeGlobalPermissions);
             document.removeEventListener('touchstart', initializeGlobalPermissions);
-            isGlobalAudioUnlocked = true;
         }
 
         document.addEventListener('click', initializeGlobalPermissions, { once: true });
@@ -1190,7 +1220,8 @@
             updateMediaSession(song);
 
             activeAudio.src = formatDropboxStreamUrl(song.src);
-            activeAudio.play().catch(console.error);
+            backgroundPlaybackExpected = true;
+            requestAudioPlay(activeAudio);
             preloadNext(); 
         };
 
@@ -1216,6 +1247,16 @@
             safeMediaAction('nexttrack', () => transitionToNext(true));
             safeMediaAction('seekbackward', () => seekBy(-10));
             safeMediaAction('seekforward', () => seekBy(10));
+            safeMediaAction('seekto', (details) => {
+                if (!Number.isFinite(activeAudio.duration)) return;
+                if (Number.isFinite(details.seekTime)) {
+                    activeAudio.currentTime = Math.max(
+                        0,
+                        Math.min(activeAudio.duration, details.seekTime)
+                    );
+                }
+            });
+            safeMediaAction('stop', pauseSong);
         }
 
         function setMediaPlaybackState(state) {
@@ -1229,21 +1270,41 @@
             coverEl.style.animationPlayState = playing ? 'running' : 'paused';
         }
 
+        function requestAudioPlay(audio = activeAudio) {
+            if (!audio) return Promise.resolve(false);
+
+            try {
+                const promise = audio.play();
+                if (promise && typeof promise.then === "function") {
+                    return promise.catch(error => {
+                        console.log("El navegador retrasó la reproducción:", error);
+                        return false;
+                    });
+                }
+                return Promise.resolve(true);
+            } catch (error) {
+                console.log("No se pudo iniciar el audio:", error);
+                return Promise.resolve(false);
+            }
+        }
+
         function playSong() {
             isPlaying = true;
-            intentionalPause = false; 
+            intentionalPause = false;
+            backgroundPlaybackExpected = true;
             playIcon.innerHTML = iconPause;
-            if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "playing"; 
-            activeAudio.play().catch(e => console.log("El sistema retrasó el play: ", e));
+            setMediaPlaybackState("playing");
             coverEl.style.animationPlayState = "running";
+            requestAudioPlay(activeAudio);
         }
 
         function pauseSong() {
             isPlaying = false;
-            intentionalPause = true; 
+            intentionalPause = true;
+            backgroundPlaybackExpected = false;
             playIcon.innerHTML = iconPlay;
-            activeAudio.pause();
-            if ('mediaSession' in navigator) navigator.mediaSession.playbackState = "paused";
+            try { activeAudio.pause(); } catch (e) {}
+            setMediaPlaybackState("paused");
             coverEl.style.animationPlayState = "paused";
         }
 
@@ -1251,6 +1312,69 @@
             if (!Number.isFinite(activeAudio.duration)) return;
             activeAudio.currentTime = Math.max(0, Math.min(activeAudio.duration, activeAudio.currentTime + seconds));
         }
+
+        /*
+         * Recuperación de una pausa accidental provocada por el navegador.
+         * La pausa intencional del usuario siempre tiene prioridad.
+         */
+        function recoverBackgroundPlayback() {
+            if (!backgroundPlaybackExpected || intentionalPause || !isPlaying) return;
+            if (!activeAudio || activeAudio.ended) return;
+
+            if (activeAudio.paused) {
+                requestAudioPlay(activeAudio);
+            }
+
+            playIcon.innerHTML = iconPause;
+            coverEl.style.animationPlayState = "running";
+            setMediaPlaybackState("playing");
+        }
+
+        function startBackgroundRecoveryWatchdog() {
+            if (backgroundRecoveryTimer) clearInterval(backgroundRecoveryTimer);
+
+            backgroundRecoveryTimer = setInterval(() => {
+                if (!backgroundPlaybackExpected || intentionalPause || !isPlaying) return;
+
+                // Solo vigilamos activamente cuando la página está visible.
+                // Con pantalla bloqueada dejamos trabajar al motor nativo de audio.
+                if (!document.hidden && activeAudio.paused && !activeAudio.ended) {
+                    recoverBackgroundPlayback();
+                }
+            }, 1500);
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                if (isPlaying && !intentionalPause && !activeAudio.paused) {
+                    backgroundPlaybackExpected = true;
+                    setMediaPlaybackState("playing");
+                }
+            } else if (backgroundPlaybackExpected && !intentionalPause) {
+                setTimeout(recoverBackgroundPlayback, 100);
+            }
+        });
+
+        window.addEventListener("pageshow", () => {
+            if (backgroundPlaybackExpected && !intentionalPause) {
+                setTimeout(recoverBackgroundPlayback, 100);
+            }
+        });
+
+        window.addEventListener("focus", () => {
+            if (backgroundPlaybackExpected && !intentionalPause) {
+                setTimeout(recoverBackgroundPlayback, 100);
+            }
+        });
+
+        window.addEventListener("online", () => {
+            if (backgroundPlaybackExpected && !intentionalPause &&
+                activeAudio.paused && !activeAudio.ended) {
+                setTimeout(recoverBackgroundPlayback, 300);
+            }
+        });
+
+        startBackgroundRecoveryWatchdog();
 
         playBtn.addEventListener('click', () => {
             if (activeAudio.paused || !isPlaying) playSong();
@@ -1272,7 +1396,8 @@
             updateMediaSession(song);
 
             activeAudio.src = formatDropboxStreamUrl(song.src);
-            activeAudio.play().catch(console.error);
+            backgroundPlaybackExpected = true;
+            requestAudioPlay(activeAudio);
             preloadNext();
         }
 
@@ -1295,7 +1420,8 @@
             updateMediaSession(song);
 
             if (isPlaying || manualClick) {
-                activeAudio.play().catch(console.error);
+                backgroundPlaybackExpected = true;
+                requestAudioPlay(activeAudio);
             }
             
             // Preparar en las sombras la canción que sigue a esta
@@ -1340,20 +1466,53 @@
 
             audioElement.addEventListener('playing', (e) => {
                 if (e.target !== activeAudio) return;
-                isBuffering = false; intentionalPause = false;
-                updatePlayButton(true); setMediaPlaybackState('playing');
+                isBuffering = false;
+                intentionalPause = false;
+                backgroundPlaybackExpected = true;
+                updatePlayButton(true);
+                setMediaPlaybackState('playing');
             });
 
             audioElement.addEventListener('play', (e) => {
                 if (e.target !== activeAudio) return;
-                if (!intentionalPause) updatePlayButton(true);
+                if (!intentionalPause) {
+                    backgroundPlaybackExpected = true;
+                    updatePlayButton(true);
+                    setMediaPlaybackState('playing');
+                }
             });
 
             audioElement.addEventListener('pause', (e) => {
                 if (e.target !== activeAudio) return;
+
                 if (isBuffering && !intentionalPause) return;
+
+                // Pausa hecha por el usuario: se respeta.
+                if (intentionalPause) {
+                    backgroundPlaybackExpected = false;
+                    updatePlayButton(false);
+                    setMediaPlaybackState('paused');
+                    return;
+                }
+
+                /*
+                 * Si el sistema provoca una pausa temporal mientras seguimos
+                 * esperando reproducción, no la tratamos como pausa intencional.
+                 */
+                if (backgroundPlaybackExpected && !activeAudio.ended) {
+                    updatePlayButton(true);
+                    setMediaPlaybackState('playing');
+
+                    // En primer plano podemos recuperar inmediatamente.
+                    // En pantalla bloqueada el elemento <audio> queda a cargo
+                    // del motor multimedia del navegador/sistema.
+                    if (!document.hidden) {
+                        setTimeout(recoverBackgroundPlayback, 50);
+                    }
+                    return;
+                }
+
                 updatePlayButton(false);
-                if (intentionalPause) setMediaPlaybackState('paused');
             });
 
             audioElement.addEventListener('waiting', (e) => {
