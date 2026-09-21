@@ -1403,13 +1403,12 @@
         nextBtn.addEventListener('click', nextSong);
 
         // Al terminar un himno, continúa automáticamente con el siguiente.
+       // Al terminar un himno, continúa automáticamente con el siguiente.
         audio.addEventListener('ended', () => {
             isBuffering = false;
-            updatePlayButton(false);
-            setMediaPlaybackState('none');
+            // Quitamos el estado 'none' para que el sistema operativo no destruya el widget
             nextSong();
         });
-
         audio.addEventListener('timeupdate', (e) => {
             const { currentTime, duration } = e.srcElement;
             if (!Number.isFinite(duration) || duration <= 0) return;
@@ -1487,7 +1486,7 @@
         audio.addEventListener('error', () => {
             isBuffering = false;
             updatePlayButton(false);
-            setMediaPlaybackState('none');
+            setMediaPlaybackState('paused'); // Cambiado a paused
             console.warn('No se pudo reproducir el audio:', audio.error);
         });
 
