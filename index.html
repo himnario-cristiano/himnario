@@ -13,6 +13,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Himnario Cristiano">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-orientation" content="portrait">
+    <meta name="apple-mobile-web-app-orientation" content="portrait">
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -1256,7 +1259,14 @@
                     );
                 }
             });
-            safeMediaAction('stop', pauseSong);
+            safeMediaAction('stop', () => {
+                intentionalPause = true;
+                backgroundPlaybackExpected = false;
+                isPlaying = false;
+                try { activeAudio.pause(); } catch (e) {}
+                setMediaPlaybackState('none');
+                updatePlayButton(false);
+            });
         }
 
         function setMediaPlaybackState(state) {
@@ -1371,6 +1381,52 @@
             if (backgroundPlaybackExpected && !intentionalPause &&
                 activeAudio.paused && !activeAudio.ended) {
                 setTimeout(recoverBackgroundPlayback, 300);
+            }
+        });
+
+        // ================================================================
+        // COMPATIBILIDAD ANDROID + iPHONE/iPAD
+        // ================================================================
+        // No pausamos el <audio> al ocultar la página. En Android Chrome y
+        // en Safari/iOS el motor multimedia del sistema debe quedarse con
+        // el audio para que continúe con pantalla bloqueada.
+        document.addEventListener("pagehide", () => {
+            // pagehide NO significa pausa del usuario. Conservamos el estado.
+            if (isPlaying && !intentionalPause && !activeAudio.ended) {
+                backgroundPlaybackExpected = true;
+                setMediaPlaybackState("playing");
+            }
+        });
+
+        window.addEventListener("pageshow", () => {
+            if (backgroundPlaybackExpected && !intentionalPause && !activeAudio.ended) {
+                setMediaPlaybackState("playing");
+                if (!document.hidden && activeAudio.paused) {
+                    setTimeout(recoverBackgroundPlayback, 150);
+                }
+            }
+        });
+
+        // Android Chrome / algunos navegadores basados en Chromium.
+        document.addEventListener("freeze", () => {
+            if (isPlaying && !intentionalPause && !activeAudio.ended) {
+                backgroundPlaybackExpected = true;
+                setMediaPlaybackState("playing");
+            }
+        });
+
+        document.addEventListener("resume", () => {
+            if (backgroundPlaybackExpected && !intentionalPause && !activeAudio.ended) {
+                setMediaPlaybackState("playing");
+                if (activeAudio.paused) setTimeout(recoverBackgroundPlayback, 100);
+            }
+        });
+
+        // Si el sistema pierde temporalmente la red al bloquear/desbloquear,
+        // esperamos a que vuelva antes de intentar recuperar el audio.
+        window.addEventListener("offline", () => {
+            if (isPlaying && !intentionalPause) {
+                backgroundPlaybackExpected = true;
             }
         });
 
@@ -1533,6 +1589,7 @@
 
         setupAudioListeners(activeAudio);
         setupAudioListeners(nextAudio);
+        startBackgroundRecoveryWatchdog();
 
         // Inicialización de arranque
         function initPlayer() {
