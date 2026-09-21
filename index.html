@@ -774,7 +774,7 @@
             </div>
         </div>
     </div> <!-- Cierre de player-container -->
-    <audio id="mainAudioPlayer" preload="auto" playsinline controls style="display: none;"></audio>
+    <audio id="mainAudioPlayer" preload="auto" playsinline controls style="position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;"></audio>
 
     <div class="player-container">
         <!-- Reproductor Superior -->
@@ -1312,37 +1312,31 @@
             titleEl.innerText = song.title || 'Sin título';
             artistEl.innerText = song.artist || '';
 
-            // Evita conservar estados del audio anterior al cambiar de himno.
             isBuffering = false;
-            audio.pause();
-            audio.currentTime = 0;
+            
+            // ALERTA: No usar audio.pause() ni audio.load() aquí.
+            // Tampoco resetear el setMediaPlaybackState('none').
+            // Hacerlo provoca que el móvil quite el permiso de reproducir con pantalla apagada.
+            
             audio.src = formatDropboxStreamUrl(song.src);
-            audio.load();
-
+            
             updatePlayButton(false);
-            setMediaPlaybackState('none');
             renderPlaylist();
             updateMediaSession(song);
         }
 
         function playSong() {
             isPlaying = true;
+            intentionalPause = false; // Declaramos que el reproductor debe estar activo
             playIcon.innerHTML = iconPause;
             
-            // 1. ACTIVAR AUTOPLAY: Esto fuerza al navegador a cargar y reproducir 
-            // la siguiente pista nativamente sin que el sistema operativo lo bloquee.
-            audio.autoplay = true; 
-
-            // 2. AVISAR AL SO INMEDIATAMENTE: No esperamos a que el audio cargue.
-            // Reclamamos el widget al instante para que no desaparezca.
+            // Reclamamos la sesión en el OS de inmediato
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.playbackState = "playing"; 
             }
             
             audio.play().catch(e => {
-                console.log("El sistema retrasó el autoplay: ", e);
-                // Si el SO bloquea temporalmente, no cambiamos la UI a "pausa".
-                // Dejamos que los eventos 'waiting' o 'playing' (que ya pusiste) lo resuelvan.
+                console.log("El sistema retrasó el play automático: ", e);
             });
             
             coverEl.style.animationPlayState = "running";
@@ -1350,10 +1344,9 @@
 
         function pauseSong() {
             isPlaying = false;
+            intentionalPause = true; // Registramos que fue una pausa intencional del usuario
             playIcon.innerHTML = iconPlay;
             
-            // DESACTIVAR AUTOPLAY: Para que no salte de canción si lo pausamos manualmente
-            audio.autoplay = false; 
             audio.pause();
             
             if ('mediaSession' in navigator) {
