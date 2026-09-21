@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIMNARIO CRISTIANO</title>
 
-    <!-- Etiquetas PWA -->
+<!-- Etiquetas PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#121212">
     <link rel="apple-touch-icon" href="icon-192x192.png">
@@ -259,7 +259,6 @@
 
         .btn:hover { color: #f7d694; }
         .btn svg { width: 20px; height: 20px; fill: currentColor; }
-        .btn.active-mode { color: #f7d694; } /* Para el estado activo del modo repetición */
 
         .btn-play { 
             background: #fff; 
@@ -681,7 +680,7 @@
             to { opacity: 1; transform: translate(0, -50%); }
         }
 
-        /* --- BANNER DE INSTALACIÓN PWA --- */
+		/* --- BANNER DE INSTALACIÓN PWA --- */
         .install-banner {
             position: fixed;
             bottom: 0;
@@ -746,32 +745,35 @@
         .btn-close-banner svg { width: 22px; height: 22px; fill: currentColor; }
 
         @media (max-width: 480px) {
-            .btn-install span { display: none; }
-            .install-banner-text { font-size: 13px; }
-            .controls { gap: 20px; }
+            .btn-install span { 
+                display: none; 
+            }
+            .install-banner-text {
+                font-size: 13px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Banner de Instalación -->
-    <div class="install-banner" id="installBanner">
-        <div class="install-banner-info">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="#f7d694">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-            </svg>
-            <div class="install-banner-text">Instalar App Himnario</div>
+<!-- Banner de Instalación -->
+        <div class="install-banner" id="installBanner">
+            <div class="install-banner-info">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="#f7d694">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                <div class="install-banner-text">Instalar App Himnario</div>
+            </div>
+            <div class="install-banner-actions">
+                <button class="btn-install" id="btnInstallApp">
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    <span>Instalar</span>
+                </button>
+                <button class="btn-close-banner" id="btnCloseBanner">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </button>
+            </div>
         </div>
-        <div class="install-banner-actions">
-            <button class="btn-install" id="btnInstallApp">
-                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                <span>Instalar</span>
-            </button>
-            <button class="btn-close-banner" id="btnCloseBanner">
-                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </button>
-        </div>
-    </div>
-    
+    </div> <!-- Cierre de player-container -->
     <audio id="mainAudioPlayer" preload="auto" playsinline controls style="position: absolute; width: 0; height: 0; opacity: 0; pointer-events: none;"></audio>
 
     <div class="player-container">
@@ -823,10 +825,6 @@
             </div>
             
             <div class="controls">
-                <button class="btn" id="modeBtn" title="Modo de reproducción">
-                    <!-- Icono por defecto (Repetir Todo) -->
-                    <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
-                </button>
                 <button class="btn btn-hide-mobile" id="prevBtn">
                     <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
                 </button>
@@ -849,8 +847,10 @@
                     <input type="text" id="searchInput" class="search-input" placeholder="Buscar canción..." autocomplete="off">
                 </div>
                 
+                <!-- Nuevo Filtro por Tema -->
                 <select id="themeFilter" class="theme-select">
                     <option value="all">Todos los temas</option>
+                    <!-- Las opciones se generarán por JavaScript -->
                 </select>
 
                 <button class="fav-filter-btn" id="favFilterBtn" title="Filtrar por Favoritos">
@@ -886,12 +886,14 @@
         <div class="modal-content">
             <button class="modal-close" id="closeRefModalBtn">&times;</button>
             <h3 id="refModalTitle">Referencias</h3>
-            <div id="refModalBody"></div>
+            <div id="refModalBody">
+                <!-- Se llenará dinámicamente -->
+            </div>
         </div>
     </div>
-    
+  <!-- Llamar al archivo externo con las canciones -->
     <script src="songs.js"></script>
-    
+	
     <script>
         const globalCoverUrl = "https://i.postimg.cc/14xJ49F9/LOGO-Himnario-Cristiano.png";
 
@@ -899,9 +901,6 @@
         const audio = document.getElementById("mainAudioPlayer");
         let isPlaying = false;
         let showOnlyFavorites = false; 
-
-        // 0 = Repetir todo (Normal), 1 = Repetir uno, 2 = Aleatorio
-        let playbackMode = 0; 
 
         const playlistEl = document.getElementById("playlistItems");
         const coverEl = document.getElementById("cover");
@@ -911,7 +910,6 @@
         const playIcon = document.getElementById("playIcon");
         const prevBtn = document.getElementById("prevBtn");
         const nextBtn = document.getElementById("nextBtn");
-        const modeBtn = document.getElementById("modeBtn");
         const progressBar = document.getElementById("progressBar");
         const progressArea = document.getElementById("progressArea");
         const currTimeEl = document.getElementById("currTime");
@@ -920,44 +918,17 @@
         const favFilterBtn = document.getElementById("favFilterBtn");
         const themeFilter = document.getElementById("themeFilter");
 
-        const iconPlay = `<path d="M8 5v14l11-7z"/>`;
-        const iconPause = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
-        
-        // Íconos SVGs para los Modos de Reproducción
-        const iconRepeatAll = `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>`;
-        const iconRepeatOne = `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/></svg>`;
-        const iconShuffle = `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`;
-
-        // Control de los modos de reproducción
-        modeBtn.addEventListener('click', () => {
-            playbackMode = (playbackMode + 1) % 3;
-            if (playbackMode === 0) {
-                modeBtn.innerHTML = iconRepeatAll;
-                modeBtn.classList.remove('active-mode');
-                modeBtn.title = "Repetir todo";
-            } else if (playbackMode === 1) {
-                modeBtn.innerHTML = iconRepeatOne;
-                modeBtn.classList.add('active-mode');
-                modeBtn.title = "Repetir himno";
-            } else {
-                modeBtn.innerHTML = iconShuffle;
-                modeBtn.classList.add('active-mode');
-                modeBtn.title = "Orden aleatorio";
-            }
-        });
-
-        const iconDownloadSvg = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
-        const iconBookSvg = `<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>`;
-        const iconDotsSvg = `<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
-
+        // --- INICIALIZAR SELECT DE TEMAS MÚLTIPLES ---
         function initThemeFilter() {
             let allThemes = [];
+            // Extraer todos los temas de todas las canciones
             songs.forEach(song => {
                 if (song.temas && Array.isArray(song.temas)) {
                     allThemes = allThemes.concat(song.temas);
                 }
             });
             
+            // Eliminar duplicados y ordenar
             const uniqueThemes = [...new Set(allThemes)].sort();
             
             uniqueThemes.forEach(tema => {
@@ -968,6 +939,7 @@
             });
         }
 
+        // --- Cierre global de menús y paneles ---
         document.addEventListener('click', (e) => {
             if (!textSizePanel.contains(e.target) && !textSizeBtn.contains(e.target)) {
                 textSizePanel.classList.remove('show');
@@ -980,6 +952,7 @@
             }
         });
 
+        // --- Lógica del Botón de Ayuda / Soporte (MODAL) ---
         const helpBtn = document.getElementById('helpBtn');
         const helpModal = document.getElementById('helpModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -999,6 +972,7 @@
             }
         });
 
+        // --- LÓGICA DEL MODAL DE REFERENCIAS (MÚLTIPLES TEMAS) ---
         const refModal = document.getElementById('refModal');
         const closeRefModalBtn = document.getElementById('closeRefModalBtn');
         const refModalTitle = document.getElementById('refModalTitle');
@@ -1016,6 +990,7 @@
             
             let html = '';
 
+            // Muestra los temas separados por coma
             if (song.temas && song.temas.length > 0) {
                 html += `<div class="ref-theme-badge">Tema(s): <span>${song.temas.join(", ")}</span></div>`;
             }
@@ -1049,6 +1024,7 @@
             }
         });
 
+        // --- LÓGICA DEL BOTÓN WHATSAPP DINÁMICO ---
         const btnWhatsappContact = document.getElementById('btnWhatsappContact');
         
         btnWhatsappContact.addEventListener('click', () => {
@@ -1067,6 +1043,7 @@
             window.open(whatsappUrl, '_blank');
         });
 
+        // --- Lógica del tamaño de texto ---
         const textSizeBtn = document.getElementById('textSizeBtn');
         const textSizePanel = document.getElementById('textSizePanel');
         const fsDecrease = document.getElementById('fsDecrease');
@@ -1105,6 +1082,13 @@
         });
 
         coverEl.src = globalCoverUrl;
+        const iconPlay = `<path d="M8 5v14l11-7z"/>`;
+        const iconPause = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
+        
+        // Íconos SVG
+        const iconDownloadSvg = `<svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>`;
+        const iconBookSvg = `<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>`;
+        const iconDotsSvg = `<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
 
         function formatDropboxStreamUrl(url) {
             if(url.includes("dropbox.com")) {
@@ -1138,6 +1122,7 @@
             renderPlaylist(); 
         }
 
+        // --- LÓGICA DE FAVORITOS Y BÚSQUEDA ---
         window.toggleFav = function(event, index) {
             event.stopPropagation(); 
             const song = songs[index];
@@ -1176,7 +1161,10 @@
             
             songs.forEach((song, i) => {
                 const matchSearch = song.title.toLowerCase().includes(query) || song.artist.toLowerCase().includes(query);
+                
+                // Comprueba si el tema seleccionado está dentro del arreglo de temas de la canción
                 const matchTheme = selectedTheme === 'all' || (song.temas && song.temas.includes(selectedTheme));
+                
                 const isFav = localStorage.getItem('fav_' + song.src) === 'true';
 
                 if (matchSearch && matchTheme) {
@@ -1188,6 +1176,7 @@
             return indices;
         }
 
+        // Activa/Desactiva el submenú en móviles
         window.toggleOptionsMenu = function(event, index) {
             event.stopPropagation();
             document.querySelectorAll('.song-actions-wrapper.show').forEach(el => {
@@ -1252,8 +1241,10 @@
             });
         }
 
+        // --- REPRODUCTOR ROBUSTO + MEDIA SESSION + SEGUNDO PLANO ---
         let intentionalPause = false;
         let isBuffering = false;
+        let playRequestId = 0;
 
         window.selectSong = function(index) {
             if (!songs[index]) return;
@@ -1294,6 +1285,8 @@
             safeMediaAction('pause', pauseSong);
             safeMediaAction('previoustrack', prevSong);
             safeMediaAction('nexttrack', nextSong);
+
+            // Controles adicionales disponibles en algunos navegadores.
             safeMediaAction('seekbackward', () => seekBy(-10));
             safeMediaAction('seekforward', () => seekBy(10));
         }
@@ -1321,7 +1314,10 @@
 
             isBuffering = false;
             
-            // Nunca llamamos pause() o load() aquí para no romper el MediaSession
+            // ALERTA: No usar audio.pause() ni audio.load() aquí.
+            // Tampoco resetear el setMediaPlaybackState('none').
+            // Hacerlo provoca que el móvil quite el permiso de reproducir con pantalla apagada.
+            
             audio.src = formatDropboxStreamUrl(song.src);
             
             updatePlayButton(false);
@@ -1331,9 +1327,10 @@
 
         function playSong() {
             isPlaying = true;
-            intentionalPause = false; 
+            intentionalPause = false; // Declaramos que el reproductor debe estar activo
             playIcon.innerHTML = iconPause;
             
+            // Reclamamos la sesión en el OS de inmediato
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.playbackState = "playing"; 
             }
@@ -1347,7 +1344,7 @@
 
         function pauseSong() {
             isPlaying = false;
-            intentionalPause = true; 
+            intentionalPause = true; // Registramos que fue una pausa intencional del usuario
             playIcon.innerHTML = iconPlay;
             
             audio.pause();
@@ -1377,12 +1374,12 @@
             if (filtered.length === 0) return;
 
             const currentIdxInFiltered = filtered.indexOf(songIndex);
-            let prevIndex = currentIdxInFiltered === -1
+            const nextIndex = currentIdxInFiltered === -1
                 ? filtered[0]
                 : filtered[(currentIdxInFiltered - 1 + filtered.length) % filtered.length];
 
             const shouldContinue = isPlaying || !audio.paused;
-            songIndex = prevIndex;
+            songIndex = nextIndex;
             loadSong(songs[songIndex]);
             if (shouldContinue) playSong();
         }
@@ -1391,24 +1388,10 @@
             const filtered = getFilteredIndices();
             if (filtered.length === 0) return;
 
-            let nextIndex;
-            
-            if (playbackMode === 1) {
-                // Repetir un himno (mismo índice)
-                nextIndex = songIndex;
-                audio.currentTime = 0;
-                if (isPlaying || !audio.paused) playSong();
-                return;
-            } else if (playbackMode === 2) {
-                // Aleatorio
-                nextIndex = filtered[Math.floor(Math.random() * filtered.length)];
-            } else {
-                // Normal / Repetir Todo
-                const currentIdxInFiltered = filtered.indexOf(songIndex);
-                nextIndex = currentIdxInFiltered === -1
-                    ? filtered[0]
-                    : filtered[(currentIdxInFiltered + 1) % filtered.length];
-            }
+            const currentIdxInFiltered = filtered.indexOf(songIndex);
+            const nextIndex = currentIdxInFiltered === -1
+                ? filtered[0]
+                : filtered[(currentIdxInFiltered + 1) % filtered.length];
 
             const shouldContinue = isPlaying || !audio.paused;
             songIndex = nextIndex;
@@ -1419,12 +1402,13 @@
         prevBtn.addEventListener('click', prevSong);
         nextBtn.addEventListener('click', nextSong);
 
+        // Al terminar un himno, continúa automáticamente con el siguiente.
+       // Al terminar un himno, continúa automáticamente con el siguiente.
         audio.addEventListener('ended', () => {
             isBuffering = false;
-            // Se invoca al cálculo inteligente de la siguiente pista
+            // Quitamos el estado 'none' para que el sistema operativo no destruya el widget
             nextSong();
         });
-        
         audio.addEventListener('timeupdate', (e) => {
             const { currentTime, duration } = e.srcElement;
             if (!Number.isFinite(duration) || duration <= 0) return;
@@ -1451,6 +1435,7 @@
             audio.currentTime = ratio * audio.duration;
         });
 
+        // Estados reales del elemento <audio>.
         audio.addEventListener('playing', () => {
             isBuffering = false;
             intentionalPause = false;
@@ -1465,7 +1450,9 @@
         });
 
         audio.addEventListener('pause', () => {
+            // Durante buffering NO forzamos aquí el estado de pausa.
             if (isBuffering && !intentionalPause) return;
+
             updatePlayButton(false);
             if (intentionalPause) {
                 setMediaPlaybackState('paused');
@@ -1473,6 +1460,7 @@
         });
 
         audio.addEventListener('waiting', () => {
+            // El audio sigue teniendo intención de reproducirse: solo esperamos datos.
             if (!intentionalPause && !audio.ended) {
                 isBuffering = true;
                 updatePlayButton(true);
@@ -1498,15 +1486,18 @@
         audio.addEventListener('error', () => {
             isBuffering = false;
             updatePlayButton(false);
-            setMediaPlaybackState('paused'); 
+            setMediaPlaybackState('paused'); // Cambiado a paused
             console.warn('No se pudo reproducir el audio:', audio.error);
         });
 
+        // Inicializar Filtros
         initThemeFilter();
+
+        // Inicializar reproductor
         loadSong(songs[songIndex]);
     </script>
-    
-    <script>
+<script>
+        // --- REGISTRO DEL SERVICE WORKER PARA PWA ---
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
@@ -1515,21 +1506,24 @@
             });
         }
 
+        // --- LÓGICA DEL BANNER DE INSTALACIÓN PWA ---
         let deferredPrompt;
         const installBanner = document.getElementById('installBanner');
         const btnInstallApp = document.getElementById('btnInstallApp');
         const btnCloseBanner = document.getElementById('btnCloseBanner');
 
+        // Escucha el evento que detecta si la app se puede instalar
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault(); 
-            deferredPrompt = e; 
-            installBanner.classList.add('show'); 
+            e.preventDefault(); // Evita que Chrome muestre el prompt automático
+            deferredPrompt = e; // Guarda el evento
+            installBanner.classList.add('show'); // Muestra nuestro banner personalizado
         });
 
+        // Acción al hacer clic en instalar
         btnInstallApp.addEventListener('click', async () => {
             if (deferredPrompt) {
                 installBanner.classList.remove('show');
-                deferredPrompt.prompt(); 
+                deferredPrompt.prompt(); // Muestra el mensaje nativo de instalación del sistema
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
                     console.log('App instalada');
@@ -1538,10 +1532,12 @@
             }
         });
 
+        // Acción al cerrar el banner
         btnCloseBanner.addEventListener('click', () => {
             installBanner.classList.remove('show');
         });
 
+        // Si ya se instaló, ocultar el banner por seguridad
         window.addEventListener('appinstalled', () => {
             installBanner.classList.remove('show');
             deferredPrompt = null;
