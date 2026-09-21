@@ -259,7 +259,7 @@
 
         .btn:hover { color: #f7d694; }
         .btn svg { width: 20px; height: 20px; fill: currentColor; }
-        .btn.active-mode { color: #f7d694; } /* Estado activo para el botón de modo */
+        .btn.active-mode { color: #f7d694; }
 
         .btn-play { 
             background: #fff; 
@@ -824,7 +824,6 @@
             
             <div class="controls">
                 <button class="btn" id="modeBtn" title="Modo de reproducción">
-                    <!-- Icono por defecto (Repetir Todo) -->
                     <svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
                 </button>
                 <button class="btn btn-hide-mobile" id="prevBtn">
@@ -893,14 +892,44 @@
     <script src="songs.js"></script>
     
     <script>
+        // --- ESTRATEGIA DE DESBLOQUEO GLOBAL DE AUDIO Y PERMISOS ---
+        let isGlobalAudioUnlocked = false;
+
+        function initializeGlobalPermissions() {
+            if (isGlobalAudioUnlocked) return;
+            
+            // 1. Pedimos permiso de notificaciones para darle prioridad al proceso en Android
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission().catch(() => {});
+            }
+
+            // 2. Desbloqueamos el elemento de audio reproduciendo silencio por un milisegundo
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    audio.pause();
+                    isGlobalAudioUnlocked = true;
+                }).catch(() => {
+                    // Ignoramos errores de autoplay previos a interacción
+                });
+            }
+
+            // Removemos los escuchadores para no repetir el proceso
+            document.removeEventListener('click', initializeGlobalPermissions);
+            document.removeEventListener('touchstart', initializeGlobalPermissions);
+        }
+
+        // Activamos esto en el primer toque de la pantalla en cualquier lado
+        document.addEventListener('click', initializeGlobalPermissions, { once: true });
+        document.addEventListener('touchstart', initializeGlobalPermissions, { once: true });
+
+
         const globalCoverUrl = "https://i.postimg.cc/14xJ49F9/LOGO-Himnario-Cristiano.png";
 
         let songIndex = 0;
         const audio = document.getElementById("mainAudioPlayer");
         let isPlaying = false;
         let showOnlyFavorites = false; 
-
-        // 0 = Repetir todo (Normal), 1 = Repetir uno, 2 = Aleatorio
         let playbackMode = 0; 
 
         const playlistEl = document.getElementById("playlistItems");
@@ -923,12 +952,10 @@
         const iconPlay = `<path d="M8 5v14l11-7z"/>`;
         const iconPause = `<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>`;
         
-        // Íconos SVGs para los Modos de Reproducción
         const iconRepeatAll = `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>`;
         const iconRepeatOne = `<svg viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4zm-4-2V9h-1l-2 1v1h1.5v4H13z"/></svg>`;
         const iconShuffle = `<svg viewBox="0 0 24 24"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>`;
 
-        // Control de los modos de reproducción
         modeBtn.addEventListener('click', () => {
             playbackMode = (playbackMode + 1) % 3;
             if (playbackMode === 0) {
@@ -1260,9 +1287,7 @@
             songIndex = index;
             intentionalPause = false;
             
-            // Activar explícitamente autoplay al tocar una pista
             audio.autoplay = true; 
-            
             loadSong(songs[songIndex]);
             playSong();
         };
@@ -1325,7 +1350,7 @@
 
             isBuffering = false;
             
-            // Reemplazamos la ruta directamente. No modificamos el botón de UI a "pausa" aquí.
+            // Reemplazo síncrono del enlace
             audio.src = formatDropboxStreamUrl(song.src);
             
             renderPlaylist();
@@ -1337,14 +1362,14 @@
             intentionalPause = false; 
             playIcon.innerHTML = iconPause;
             
-            audio.autoplay = true; // Fundamental para que reproduzca al instante
+            audio.autoplay = true; 
             
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.playbackState = "playing"; 
             }
             
             audio.play().catch(e => {
-                console.log("El sistema retrasó el play automático: ", e);
+                console.log("El sistema retrasó el play: ", e);
             });
             
             coverEl.style.animationPlayState = "running";
@@ -1355,7 +1380,7 @@
             intentionalPause = true; 
             playIcon.innerHTML = iconPlay;
             
-            audio.autoplay = false; // Desactivar auto-arranque si la pausamos manual
+            audio.autoplay = false; 
             audio.pause();
             
             if ('mediaSession' in navigator) {
@@ -1382,7 +1407,6 @@
             const filtered = getFilteredIndices();
             if (filtered.length === 0) return;
 
-            // Evaluamos si debe continuar reproduciendo automáticamente
             const shouldContinue = isPlaying || !audio.paused || audio.ended;
 
             const currentIdxInFiltered = filtered.indexOf(songIndex);
@@ -1402,13 +1426,13 @@
             const filtered = getFilteredIndices();
             if (filtered.length === 0) return;
 
-            // Determinamos si la intención actual es reproducir (clave para segundo plano)
+            // Clave para evitar el corte en segundo plano
             const shouldContinue = isPlaying || !audio.paused || audio.ended;
 
             let nextIndex;
             
             if (playbackMode === 1) {
-                // Repetir un himno (mismo índice)
+                // Repetir un himno
                 nextIndex = songIndex;
                 audio.currentTime = 0;
                 if (shouldContinue) playSong();
@@ -1426,7 +1450,9 @@
 
             songIndex = nextIndex;
             
-            if (shouldContinue) audio.autoplay = true; // Instrucción forzada al OS
+            if (shouldContinue) {
+                audio.autoplay = true; 
+            }
             
             loadSong(songs[songIndex]);
             
@@ -1439,12 +1465,11 @@
         audio.addEventListener('ended', () => {
             isBuffering = false;
             
-            // Le avisamos expresamente al sistema operativo que SEGUIMOS en reproducción
             if ('mediaSession' in navigator) {
                 navigator.mediaSession.playbackState = "playing";
             }
             
-            // Inicia la lógica de la siguiente pista de inmediato
+            // Llamada directa y síncrona a la siguiente canción
             nextSong();
         });
         
