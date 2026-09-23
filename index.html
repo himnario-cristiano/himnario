@@ -556,15 +556,97 @@
             margin: 0 auto 15px auto;
             text-align: center;
             background: #1e1e1e;
-            padding: 6px 14px;
+            padding: 10px 14px;
             border-radius: 15px;
             border: 1px solid #3e3e3e;
-            display: inline-block;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         .ref-theme-badge span {
             color: #fff;
             font-weight: 600;
-            margin-left: 5px;
+        }
+
+        /* Botón de ver partitura */
+        .view-score-btn {
+            background: #f7d694;
+            color: #000;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .view-score-btn:hover { background: #e5c483; transform: scale(1.05); }
+
+        /* Estilos Visor de Partitura Pantalla Completa */
+        .score-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000;
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .score-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .score-header {
+            height: 55px;
+            background: #1e1e1e;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 0 15px;
+            gap: 10px;
+            border-bottom: 1px solid #3e3e3e;
+            flex-shrink: 0;
+        }
+        .score-header button {
+            background: #333;
+            color: #fff;
+            border: none;
+            width: 36px; height: 36px;
+            border-radius: 6px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: background 0.2s;
+        }
+        .score-header button:hover { background: #f7d694; color: #000; }
+        .score-header .close-btn { background: transparent; font-size: 32px; color: #b3b3b3; margin-left: auto;}
+        .score-header .close-btn:hover { color: #f7d694; background: transparent; }
+        
+        .score-body {
+            flex: 1;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+            background: #121212;
+        }
+        .score-body iframe {
+            width: 100%; height: 100%; border: none;
+        }
+        .score-body img {
+            width: 100%;
+            max-width: none;
+            transition: width 0.2s;
+            /* Previene el arrastre de imagen para guardar */
+            -webkit-user-drag: none;
+            user-select: none;
         }
 
         #refModalBody {
@@ -772,7 +854,6 @@
         </div>
     </div>
     
-    <!-- SISTEMA ÚNICO DE AUDIO. Eliminar el audioPlayer2 evita bloqueos del MediaSession en iOS y Android. -->
     <audio id="audioPlayer1" class="audio-engine" preload="auto" playsinline webkit-playsinline></audio>
 
     <div class="player-container">
@@ -886,10 +967,20 @@
         </div>
     </div>
     
+    <!-- Modal para ver partituras e imágenes en pantalla completa -->
+    <div class="score-modal" id="scoreModal">
+        <div class="score-header">
+            <!-- La X alineada a la izquierda/derecha usando margen en CSS -->
+            <button class="close-btn" id="closeScoreModal">&times;</button>
+            <button id="scoreZoomOut" title="Alejar (Zoom Out)">-</button>
+            <button id="scoreZoomIn" title="Acercar (Zoom In)">+</button>
+        </div>
+        <div class="score-body" id="scoreBody"></div>
+    </div>
+
     <script src="songs.js"></script>
     
     <script>
-        // --- SISTEMA DE AUDIO ÚNICO CORREGIDO PARA SEGUNDO PLANO ---
         let activeAudio = document.getElementById("audioPlayer1");
         let isGlobalAudioUnlocked = false;
 
@@ -975,7 +1066,6 @@
         const iconBookSvg = `<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>`;
         const iconDotsSvg = `<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
 
-        // UI & Filtros
         function initThemeFilter() {
             let allThemes = [];
             songs.forEach(song => {
@@ -1011,18 +1101,94 @@
         const refModalTitle = document.getElementById('refModalTitle');
         const refModalBody = document.getElementById('refModalBody');
 
+        /* LÓGICA DE PARTITURA/PDF AÑADIDA AQUÍ */
+        const scoreModal = document.getElementById('scoreModal');
+        const scoreBody = document.getElementById('scoreBody');
+        const closeScoreModal = document.getElementById('closeScoreModal');
+        const scoreZoomIn = document.getElementById('scoreZoomIn');
+        const scoreZoomOut = document.getElementById('scoreZoomOut');
+        let currentImgWidth = 100; // Porcentaje de ancho inicial para las imágenes
+
+        window.openScore = function(event, url) {
+            event.stopPropagation();
+            currentImgWidth = 100;
+            scoreBody.innerHTML = '';
+            
+            const isPdf = url.toLowerCase().includes('.pdf');
+            
+            if (isPdf) {
+                // PDF no necesita botones propios de zoom porque usa los nativos
+                scoreZoomIn.style.display = 'none';
+                scoreZoomOut.style.display = 'none';
+                
+                // #toolbar=0&navpanes=0 bloquea botones de guardado directo
+                const pdfUrl = url.includes('#') ? url : url + '#toolbar=0&navpanes=0';
+                scoreBody.innerHTML = `<iframe src="${pdfUrl}"></iframe>`;
+            } else {
+                scoreZoomIn.style.display = 'flex';
+                scoreZoomOut.style.display = 'flex';
+                // oncontextmenu="return false;" previene dar clic derecho/pulsar prolongadamente para descargar
+                scoreBody.innerHTML = `<img id="scoreImage" src="${url}" oncontextmenu="return false;" />`;
+            }
+            
+            scoreModal.classList.add('show');
+        };
+
+        closeScoreModal.addEventListener('click', () => {
+            scoreModal.classList.remove('show');
+            scoreBody.innerHTML = ''; 
+        });
+
+        scoreZoomIn.addEventListener('click', () => {
+            const img = document.getElementById('scoreImage');
+            if(img) {
+                currentImgWidth += 20; // Incrementa ancho un 20%
+                img.style.width = `${currentImgWidth}%`;
+            }
+        });
+
+        scoreZoomOut.addEventListener('click', () => {
+            const img = document.getElementById('scoreImage');
+            if(img && currentImgWidth > 40) { // Límite para no encogerlo demasiado
+                currentImgWidth -= 20;
+                img.style.width = `${currentImgWidth}%`;
+            }
+        });
+
         window.openRefModal = function(event, index) {
             event.stopPropagation();
             document.querySelectorAll('.song-actions-wrapper.show').forEach(el => el.classList.remove('show'));
             const song = songs[index];
             refModalTitle.innerText = song.title;
             let html = '';
-            if (song.temas && song.temas.length > 0) html += `<div class="ref-theme-badge">Tema(s): <span>${song.temas.join(", ")}</span></div>`;
+            
+            // Renderiza los temas y el nuevo botón de partitura si el atributo existe
+            let themeHtml = '';
+            if (song.temas && song.temas.length > 0) {
+                themeHtml += `<span>Tema(s): <span>${song.temas.join(", ")}</span></span>`;
+            }
+            
+            // Aquí se añade el botón
+            if (song.partitura) {
+                themeHtml += `
+                <button class="view-score-btn" onclick="openScore(event, '${song.partitura}')">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right:5px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg> 
+                    Ver Partitura
+                </button>`;
+            }
+
+            if (themeHtml) {
+                html += `<div class="ref-theme-badge">${themeHtml}</div>`;
+            }
+            
             if (song.references && song.references.length > 0) {
                 html += '<ul class="ref-list">';
                 song.references.forEach(ref => { html += `<li class="ref-item"><span class="ref-hymnal">${ref.hymnal}</span><span class="ref-number">#${ref.number}</span></li>`; });
                 html += '</ul>';
-            } else { html += '<p style="text-align:center; padding: 20px 0; color: #b3b3b3;">No hay referencias a otros himnarios para esta canción.</p>'; }
+            } else { 
+                html += '<p style="text-align:center; padding: 20px 0; color: #b3b3b3;">No hay referencias a otros himnarios para esta canción.</p>'; 
+            }
+            
             refModalBody.innerHTML = html;
             refModal.classList.add('show');
         };
@@ -1372,7 +1538,6 @@
             requestAudioPlay(activeAudio);
         }
 
-        // --- SISTEMA CORREGIDO ---
         function transitionToNext(manualClick = false) {
             const filtered = getFilteredIndices();
             if (filtered.length === 0) return;
@@ -1385,7 +1550,6 @@
             renderPlaylist();
             updateMediaSession(song);
 
-            // Reutilizar EXACTAMENTE el mismo reproductor mantiene viva la MediaSession con la pantalla apagada
             activeAudio.src = formatDropboxStreamUrl(song.src);
             activeAudio.load(); 
 
@@ -1395,7 +1559,6 @@
                 backgroundPlaybackExpected = true;
                 updatePlayButton(true);
                 setMediaPlaybackState('playing');
-                // Esto obliga a iniciar síncronamente respetando el control en segundo plano del SO
                 requestAudioPlay(activeAudio); 
             }
         }
