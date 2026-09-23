@@ -8,7 +8,7 @@
                 src: "https://www.dropbox.com/scl/fi/wysxwxko1a5sdj40d8jjo/001.-Himno-de-Bienvenida.mp3?rlkey=5jbqnsjum1xdeu29nwbult0pi&st=50ccjm4n&dl=0",
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
         		// Si la canción no tiene partitura, simplemente no incluyas esta línea y el botón no aparecerá
-        		partitura: "https://tu-dominio.com/partituras/001-bienvenida.jpg",
+        		partitura: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR18v5RLpPE-dKy0V6rFkWt-mxfjzsvgc2PZD8q5gsdWQEonAP4XKOgL7KW&s=10",
 				
                  references: [
                     { hymnal: "Cantos Del Camino", number: "189" },
