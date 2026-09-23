@@ -6,6 +6,10 @@
                 artist: "Himnario Cristiano",
                 temas: [],
                 src: "https://www.dropbox.com/scl/fi/wysxwxko1a5sdj40d8jjo/001.-Himno-de-Bienvenida.mp3?rlkey=5jbqnsjum1xdeu29nwbult0pi&st=50ccjm4n&dl=0",
+				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
+        		// Si la canción no tiene partitura, simplemente no incluyas esta línea y el botón no aparecerá
+        		partitura: "https://tu-dominio.com/partituras/001-bienvenida.jpg",
+				
                  references: [
                     { hymnal: "Cantos Del Camino", number: "189" },
                     { hymnal: "Cantos Espirituales", number: "000" },
