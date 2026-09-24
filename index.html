@@ -655,10 +655,8 @@
             background: #fff;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             max-width: none; 
-            /* Importante para no perder la alta resolución */
-            image-rendering: -moz-crisp-edges;
-            image-rendering: -webkit-optimize-contrast;
-            image-rendering: crisp-edges;
+            /* SE ELIMINÓ image-rendering para permitir que el navegador aplique 
+               su suavizado natural y vectorial al reescalar el canvas HD */
         }
         
         .score-body img {
@@ -1130,7 +1128,7 @@
         const scoreZoomOut = document.getElementById('scoreZoomOut');
         
         /* ----------------------------------------------------
-           LÓGICA NATIVA DE PDF.JS (CALIDAD HD + SCROLL)
+           LÓGICA NATIVA DE PDF.JS (CALIDAD VECTORIAL DEFINITIVA)
            ---------------------------------------------------- */
         
         const pdfjsLib = window['pdfjs-dist/build/pdf'];
@@ -1142,13 +1140,16 @@
         let currentScale = null;
         let currentImgWidth = 100;
         
-        // Renderiza todas las páginas hacia abajo (Scroll continuo con Alta Calidad)
+        // Renderiza todas las páginas hacia abajo (Scroll continuo con Sobremuestreo Extremo)
         async function renderAllPages() {
             if (!pdfDoc) return;
             scoreBody.innerHTML = ''; 
             
-            // Detecta la densidad de píxeles de la pantalla (2 para retina/móviles, 1 para monitores normales)
-            const outputScale = window.devicePixelRatio || 1;
+            // 🔥 LA MAGIA: Forzamos mínimo 3x (o 4x si es móvil de alta gama) de resolución interna
+            // Esto asegura que incluso en un monitor de escritorio estándar de 1080p, 
+            // el lienzo se dibuje en altísima resolución y luego se reduzca, viéndose idéntico a un vector.
+            const basePixelRatio = window.devicePixelRatio || 1;
+            const outputScale = Math.max(basePixelRatio, 3); 
             
             for (let num = 1; num <= pdfDoc.numPages; num++) {
                 const page = await pdfDoc.getPage(num);
@@ -1168,17 +1169,17 @@
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
-                // Magia para HD: El canvas físico es el doble o triple de grande
+                // Tamaño interno (Super Resolución)
                 canvas.width = Math.floor(viewport.width * outputScale);
                 canvas.height = Math.floor(viewport.height * outputScale);
                 
-                // El tamaño visual (CSS) se mantiene normal
+                // Tamaño visual CSS (Tamaño Normal)
                 canvas.style.width = Math.floor(viewport.width) + "px";
                 canvas.style.height = Math.floor(viewport.height) + "px";
                 
                 scoreBody.appendChild(canvas);
                 
-                // Aplicamos la transformación de la escala de la pantalla al contexto del dibujo
+                // Aplicamos la transformación de la escala hiper-detallada
                 const transform = outputScale !== 1 
                     ? [outputScale, 0, 0, outputScale, 0, 0] 
                     : null;
@@ -1214,7 +1215,7 @@
                 currentScale = null; 
                 pdfDoc = null;
                 
-                // Extraer el archivo PDF e iniciar Renderizado en Alta Calidad
+                // Extraer el archivo PDF e iniciar Renderizado en Alta Calidad Vectorial
                 pdfjsLib.getDocument(finalUrl).promise.then(function(pdfDoc_) {
                     pdfDoc = pdfDoc_;
                     renderAllPages();
