@@ -73,7 +73,7 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
-        /* BARRA SUTIL DE PROGRESO (Solo se usará en el Visor PDF ahora) */
+        /* BARRA SUTIL DE PROGRESO (Solo se usará en el Visor PDF) */
         .navbar-progress-bar {
             position: absolute;
             bottom: -1px;
@@ -674,18 +674,18 @@
         }
         .score-zoom-panel.show { display: flex; }
         
-        /* Contenedor scrolleable */
+        /* Contenedor scrolleable - REESCRITO PARA EVITAR CORTE A LA IZQUIERDA */
         .score-body {
             flex: 1;
             overflow: auto; 
             display: block; 
-            text-align: center;
             background: #121212;
             padding: 15px;
+            /* Se ha eliminado text-align: center para evitar que el lado izquierdo se oculte en anchos grandes */
         }
         
         .score-body canvas {
-            display: inline-block;
+            display: block; /* Convertido a block para que el margin auto respete el scroll */
             margin: 0 auto 15px auto; 
             background: #fff;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
@@ -693,7 +693,7 @@
         }
         
         .score-body img {
-            display: inline-block;
+            display: block; /* Convertido a block */
             margin: 0 auto 15px auto;
             width: 100%;
             max-width: 100%;
@@ -1177,7 +1177,7 @@
         let pdfDoc = null;
         let initialScale = null;
         let currentZoomPercent = 100; 
-        let currentScoreIndex = null; // Índice de la partitura que se está visualizando
+        let currentScoreIndex = null; 
         
         const scoreZoomToggle = document.getElementById('scoreZoomToggle');
         const scoreZoomPanel = document.getElementById('scoreZoomPanel');
@@ -1226,11 +1226,13 @@
                 if (num === 1 && !initialScale) {
                     const containerWidth = scoreBody.clientWidth;
                     const unscaledViewport = page.getViewport({scale: 1});
-                    let targetWidth = containerWidth - 30;
-                    if (targetWidth > 900) targetWidth = 900; 
+                    
+                    // Incrementamos el margen a 40px para evitar el desborde por el espacio de la barra de desplazamiento lateral
+                    let targetWidth = containerWidth - 40; 
+                    if (targetWidth > 1200) targetWidth = 1200; 
 
                     initialScale = targetWidth / unscaledViewport.width; 
-                    if (initialScale < 0.5) initialScale = 0.5;
+                    if (initialScale < 0.2) initialScale = 0.2;
                 }
                 
                 let appliedScale = initialScale * (currentZoomPercent / 100);
@@ -1260,7 +1262,6 @@
 
             scoreBody.innerHTML = '';
             
-            // Sincronizar el icono del visor con el audio general si ya está sonando esta misma canción
             if(scorePlayIcon) {
                 if(songIndex === currentScoreIndex && isPlaying) {
                     scorePlayIcon.innerHTML = iconPause;
@@ -1307,7 +1308,6 @@
         document.getElementById('scorePlayPauseBtn').addEventListener('click', (e) => {
             e.stopPropagation();
             
-            // Si el reproductor está en una canción diferente a la partitura actual, cámbialo
             if (songIndex !== currentScoreIndex) {
                 selectSong(currentScoreIndex);
             } else {
@@ -1560,7 +1560,6 @@
             playIcon.innerHTML = playing ? iconPause : iconPlay;
             
             if (scorePlayIcon) {
-                // Si la canción actual es igual a la partitura, sincronizar el botón interno.
                 if (songIndex === currentScoreIndex) {
                     scorePlayIcon.innerHTML = playing ? iconPause : iconPlay;
                 }
@@ -1742,12 +1741,10 @@
             audioElement.addEventListener('ended', (e) => {
                 if (songs.length > 0) {
                     
-                    // Si el visor de PDF está visible y coincide con la canción en reproducción, repetir el audio (bucle).
                     if (document.getElementById('scoreModal').classList.contains('show') && songIndex === currentScoreIndex) {
                         activeAudio.currentTime = 0;
                         playSong();
                     } else {
-                        // De lo contrario, proceder a la siguiente canción
                         backgroundPlaybackExpected = true;
                         intentionalPause = false;
                         isPlaying = true;
@@ -1763,7 +1760,6 @@
                 
                 progressBar.style.width = `${progressPercent}%`;
                 
-                // Actualiza SOLAMENTE la barra del modal del PDF y solo si la canción coincide con el score.
                 if(scoreProgressBar) {
                     if (songIndex === currentScoreIndex) {
                         scoreProgressBar.style.width = `${progressPercent}%`;
