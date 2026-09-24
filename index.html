@@ -73,6 +73,19 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
+        /* BARRA SUTIL INFERIOR EN EL NAVBAR */
+        .navbar-progress-bar {
+            position: absolute;
+            bottom: -1px; /* Para superponerse exactamente al borde inferior */
+            left: 0;
+            height: 2px;
+            background: #f7d694;
+            width: 0%;
+            transition: width 0.1s linear;
+            z-index: 5;
+            box-shadow: 0 -1px 4px rgba(247, 214, 148, 0.4);
+        }
+
         .top-row {
             display: flex;
             align-items: center;
@@ -877,7 +890,6 @@
 </head>
 <body>
     <div class="install-banner" id="installBanner">
-        <!-- ... (código del banner omitido por brevedad, no cambia) ... -->
         <div class="install-banner-info">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="#f7d694"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             <div class="install-banner-text">Instalar App Himnario</div>
@@ -891,7 +903,7 @@
     <audio id="audioPlayer1" class="audio-engine" preload="auto" playsinline webkit-playsinline></audio>
 
     <div class="player-container">
-        <!-- Reproductor Superior -->
+        <!-- Reproductor Superior (Navbar) -->
         <div class="now-playing" id="nowPlaying">
             
             <div class="top-right-actions">
@@ -950,6 +962,9 @@
                     <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
                 </button>
             </div>
+
+            <!-- BARRA DE PROGRESO SUTIL EN EL BORDE INFERIOR -->
+            <div class="navbar-progress-bar" id="navbarProgress"></div>
         </div>
 
         <div class="playlist">
@@ -1071,12 +1086,13 @@
         const artistEl = document.getElementById("artist");
         const playBtn = document.getElementById("playBtn");
         const playIcon = document.getElementById("playIcon");
-        const scorePlayIcon = document.getElementById("scorePlayIcon"); // Icono del visor PDF
+        const scorePlayIcon = document.getElementById("scorePlayIcon"); 
         const prevBtn = document.getElementById("prevBtn");
         const nextBtn = document.getElementById("nextBtn");
         const modeBtn = document.getElementById("modeBtn");
         const progressBar = document.getElementById("progressBar");
         const progressArea = document.getElementById("progressArea");
+        const navbarProgress = document.getElementById("navbarProgress"); // Barra sutil extraída del DOM
         const currTimeEl = document.getElementById("currTime");
         const totalTimeEl = document.getElementById("totalTime");
         const searchInput = document.getElementById("searchInput");
@@ -1222,7 +1238,6 @@
             for (let num = 1; num <= pdfDoc.numPages; num++) {
                 const page = await pdfDoc.getPage(num);
                 
-                // Si es la primera carga y no existe Scale 100% definido, calcularlo.
                 if (num === 1 && !initialScale) {
                     const containerWidth = scoreBody.clientWidth;
                     const unscaledViewport = page.getViewport({scale: 1});
@@ -1233,7 +1248,6 @@
                     if (initialScale < 0.5) initialScale = 0.5;
                 }
                 
-                // La escala actual se calcula multiplicando el Initial(100%) por el Porcentaje del Panel
                 let appliedScale = initialScale * (currentZoomPercent / 100);
                 
                 const cssViewport = page.getViewport({scale: appliedScale});
@@ -1269,7 +1283,6 @@
                 finalUrl = finalUrl.replace("www.dropbox.com", "dl.dropboxusercontent.com");
             }
             
-            // Reiniciar Valores para el Zoom Nuevo Documento
             currentZoomPercent = 100;
             initialScale = null;
             pdfDoc = null;
@@ -1543,12 +1556,10 @@
             try { navigator.mediaSession.playbackState = state; } catch (error) {}
         }
 
-        // --- ACTUALIZACIÓN DE ICONOS SINCRONIZADA ---
         function updatePlayButton(playing) {
             isPlaying = playing;
             playIcon.innerHTML = playing ? iconPause : iconPlay;
             
-            // Si el visor está abierto, el botón ahí también cambia
             if (scorePlayIcon) {
                 scorePlayIcon.innerHTML = playing ? iconPause : iconPlay;
             }
@@ -1739,7 +1750,12 @@
                 const { currentTime, duration } = e.target;
                 if (!Number.isFinite(duration) || duration <= 0) return;
                 const progressPercent = Math.min(100, Math.max(0, (currentTime / duration) * 100));
+                
+                // Actualiza la barra normal
                 progressBar.style.width = `${progressPercent}%`;
+                
+                // Actualiza la nueva barra sutil del Navbar
+                if(navbarProgress) navbarProgress.style.width = `${progressPercent}%`;
 
                 let currMins = Math.floor(currentTime / 60);
                 let currSecs = Math.floor(currentTime % 60);
