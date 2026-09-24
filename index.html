@@ -155,13 +155,7 @@
             transition: background 0.2s;
         }
         .fs-row button:hover { background: #f7d694; color: #000; }
-		#szDisplay{
-		color: #fff;
-		font-size: 14px;
-		font-weight: 600;
-		min-width: 45px;
-		text-align: center;
-		}
+
         #fsDisplay {
             color: #fff;
             font-size: 14px;
@@ -1030,7 +1024,7 @@
             <div class="score-zoom-panel" id="scoreZoomPanel">
                 <div class="fs-row">
                     <button id="szDecrease">-</button>
-                    <span id="szDisplay" >100%</span>
+                    <span id="szDisplay">100%</span>
                     <button id="szIncrease">+</button>
                 </div>
                 <button class="sz-reset" id="szReset">Restablecer 100%</button>
@@ -1098,7 +1092,7 @@
         const modeBtn = document.getElementById("modeBtn");
         const progressBar = document.getElementById("progressBar");
         const progressArea = document.getElementById("progressArea");
-        const scoreProgressBar = document.getElementById("scoreProgressBar"); // Barra en el visor PDF
+        const scoreProgressBar = document.getElementById("scoreProgressBar"); 
         const currTimeEl = document.getElementById("currTime");
         const totalTimeEl = document.getElementById("totalTime");
         const searchInput = document.getElementById("searchInput");
@@ -1181,8 +1175,9 @@
         }
         
         let pdfDoc = null;
-        let initialScale = null; // Scale base para el "100%"
-        let currentZoomPercent = 100; // Porcentaje universal
+        let initialScale = null;
+        let currentZoomPercent = 100; 
+        let currentScoreIndex = null; // Índice de la partitura que se está visualizando
         
         const scoreZoomToggle = document.getElementById('scoreZoomToggle');
         const scoreZoomPanel = document.getElementById('scoreZoomPanel');
@@ -1191,13 +1186,11 @@
         const szDisplay = document.getElementById('szDisplay');
         const szReset = document.getElementById('szReset');
 
-        // Toggle del Panel Flotante
         scoreZoomToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             scoreZoomPanel.classList.toggle('show');
         });
 
-        // Ocultar panel si clickeamos afuera
         scoreModal.addEventListener('click', (e) => {
             if (!scoreZoomPanel.contains(e.target) && !scoreZoomToggle.contains(e.target)) {
                 scoreZoomPanel.classList.remove('show');
@@ -1212,27 +1205,13 @@
                 img.style.width = `${currentZoomPercent}%`;
                 img.style.maxWidth = 'none'; 
             } else if (pdfDoc && initialScale) {
-                // Al volver a renderizar con la nueva escala, dibujará la página aplicando el zoom
                 renderAllPages();
             }
         }
 
-        szIncrease.addEventListener('click', () => {
-            currentZoomPercent += 25;
-            updateScoreZoomDisplay();
-        });
-
-        szDecrease.addEventListener('click', () => {
-            if (currentZoomPercent > 25) { 
-                currentZoomPercent -= 25;
-                updateScoreZoomDisplay();
-            }
-        });
-
-        szReset.addEventListener('click', () => {
-            currentZoomPercent = 100;
-            updateScoreZoomDisplay();
-        });
+        szIncrease.addEventListener('click', () => { currentZoomPercent += 25; updateScoreZoomDisplay(); });
+        szDecrease.addEventListener('click', () => { if (currentZoomPercent > 25) { currentZoomPercent -= 25; updateScoreZoomDisplay(); } });
+        szReset.addEventListener('click', () => { currentZoomPercent = 100; updateScoreZoomDisplay(); });
         
         async function renderAllPages() {
             if (!pdfDoc) return;
@@ -1274,15 +1253,23 @@
             }
         }
 
-        window.openScore = function(event, url) {
+        window.openScore = function(event, index) {
             event.stopPropagation();
+            currentScoreIndex = index;
+            const url = songs[index].partitura;
+
             scoreBody.innerHTML = '';
             
-            // Sincronizar el icono del visor con el audio general si ya está sonando
-            if(scorePlayIcon) scorePlayIcon.innerHTML = isPlaying ? iconPause : iconPlay;
+            // Sincronizar el icono del visor con el audio general si ya está sonando esta misma canción
+            if(scorePlayIcon) {
+                if(songIndex === currentScoreIndex && isPlaying) {
+                    scorePlayIcon.innerHTML = iconPause;
+                } else {
+                    scorePlayIcon.innerHTML = iconPlay;
+                }
+            }
 
             const isPdf = url.toLowerCase().includes('.pdf');
-            
             let finalUrl = url;
             if (finalUrl.includes("dropbox.com")) {
                 finalUrl = finalUrl.replace(/[?&]dl=[01]/g, "").replace(/[?&]raw=[01]/g, "");
@@ -1319,8 +1306,14 @@
         // Controles de Play/Pausa Inyectados en el Visor
         document.getElementById('scorePlayPauseBtn').addEventListener('click', (e) => {
             e.stopPropagation();
-            if (activeAudio.paused || !isPlaying) playSong();
-            else pauseSong();
+            
+            // Si el reproductor está en una canción diferente a la partitura actual, cámbialo
+            if (songIndex !== currentScoreIndex) {
+                selectSong(currentScoreIndex);
+            } else {
+                if (activeAudio.paused || !isPlaying) playSong();
+                else pauseSong();
+            }
         });
 
 
@@ -1338,7 +1331,7 @@
             
             if (song.partitura) {
                 themeHtml += `
-                <button class="view-score-btn" onclick="openScore(event, '${song.partitura}')">
+                <button class="view-score-btn" onclick="openScore(event, ${index})">
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" style="margin-right:5px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg> 
                     Ver Partitura
                 </button>`;
@@ -1567,7 +1560,10 @@
             playIcon.innerHTML = playing ? iconPause : iconPlay;
             
             if (scorePlayIcon) {
-                scorePlayIcon.innerHTML = playing ? iconPause : iconPlay;
+                // Si la canción actual es igual a la partitura, sincronizar el botón interno.
+                if (songIndex === currentScoreIndex) {
+                    scorePlayIcon.innerHTML = playing ? iconPause : iconPlay;
+                }
             }
 
             coverEl.style.animationPlayState = playing ? 'running' : 'paused';
@@ -1745,10 +1741,18 @@
         function setupAudioListeners(audioElement) {
             audioElement.addEventListener('ended', (e) => {
                 if (songs.length > 0) {
-                    backgroundPlaybackExpected = true;
-                    intentionalPause = false;
-                    isPlaying = true;
-                    transitionToNext(true);
+                    
+                    // Si el visor de PDF está visible y coincide con la canción en reproducción, repetir el audio (bucle).
+                    if (document.getElementById('scoreModal').classList.contains('show') && songIndex === currentScoreIndex) {
+                        activeAudio.currentTime = 0;
+                        playSong();
+                    } else {
+                        // De lo contrario, proceder a la siguiente canción
+                        backgroundPlaybackExpected = true;
+                        intentionalPause = false;
+                        isPlaying = true;
+                        transitionToNext(true);
+                    }
                 }
             });
 
@@ -1759,8 +1763,14 @@
                 
                 progressBar.style.width = `${progressPercent}%`;
                 
-                // Actualiza SOLAMENTE la barra del modal del PDF
-                if(scoreProgressBar) scoreProgressBar.style.width = `${progressPercent}%`;
+                // Actualiza SOLAMENTE la barra del modal del PDF y solo si la canción coincide con el score.
+                if(scoreProgressBar) {
+                    if (songIndex === currentScoreIndex) {
+                        scoreProgressBar.style.width = `${progressPercent}%`;
+                    } else {
+                        scoreProgressBar.style.width = `0%`;
+                    }
+                }
 
                 let currMins = Math.floor(currentTime / 60);
                 let currSecs = Math.floor(currentTime % 60);
