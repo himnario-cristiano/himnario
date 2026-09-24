@@ -73,10 +73,10 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
-        /* BARRA SUTIL DE PROGRESO (Reutilizable) */
+        /* BARRA SUTIL DE PROGRESO (Solo se usará en el Visor PDF ahora) */
         .navbar-progress-bar {
             position: absolute;
-            bottom: -1px; /* Para superponerse exactamente al borde inferior */
+            bottom: -1px;
             left: 0;
             height: 2px;
             background: #f7d694;
@@ -962,9 +962,6 @@
                     <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
                 </button>
             </div>
-
-            <!-- BARRA DE PROGRESO SUTIL EN EL BORDE INFERIOR DEL REPRODUCTOR PRINCIPAL -->
-            <div class="navbar-progress-bar" id="navbarProgress"></div>
         </div>
 
         <div class="playlist">
@@ -1095,8 +1092,7 @@
         const modeBtn = document.getElementById("modeBtn");
         const progressBar = document.getElementById("progressBar");
         const progressArea = document.getElementById("progressArea");
-        const navbarProgress = document.getElementById("navbarProgress"); 
-        const scoreProgressBar = document.getElementById("scoreProgressBar"); // Nueva barra en el visor
+        const scoreProgressBar = document.getElementById("scoreProgressBar"); // Barra en el visor PDF
         const currTimeEl = document.getElementById("currTime");
         const totalTimeEl = document.getElementById("totalTime");
         const searchInput = document.getElementById("searchInput");
@@ -1756,9 +1752,8 @@
                 const progressPercent = Math.min(100, Math.max(0, (currentTime / duration) * 100));
                 
                 progressBar.style.width = `${progressPercent}%`;
-                if(navbarProgress) navbarProgress.style.width = `${progressPercent}%`;
                 
-                // Actualiza la barra del modal del PDF
+                // Actualiza SOLAMENTE la barra del modal del PDF
                 if(scoreProgressBar) scoreProgressBar.style.width = `${progressPercent}%`;
 
                 let currMins = Math.floor(currentTime / 60);
