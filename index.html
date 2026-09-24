@@ -1101,15 +1101,15 @@
         const refModalTitle = document.getElementById('refModalTitle');
         const refModalBody = document.getElementById('refModalBody');
 
-        /* LÓGICA DE PARTITURA/PDF AÑADIDA AQUÍ */
+        /* LÓGICA DE PARTITURA/PDF ACTUALIZADA */
         const scoreModal = document.getElementById('scoreModal');
         const scoreBody = document.getElementById('scoreBody');
         const closeScoreModal = document.getElementById('closeScoreModal');
         const scoreZoomIn = document.getElementById('scoreZoomIn');
         const scoreZoomOut = document.getElementById('scoreZoomOut');
-        let currentImgWidth = 100; // Porcentaje de ancho inicial para las imágenes
+        let currentImgWidth = 100;
 
-        /* LÓGICA DE PARTITURA/PDF COMPATIBLE CON DROPBOX */
+        /* LÓGICA DE PARTITURA/PDF COMPATIBLE CON DROPBOX Y VISOR NATIVO */
         window.openScore = function(event, url) {
             event.stopPropagation();
             currentImgWidth = 100;
@@ -1117,35 +1117,28 @@
             
             const isPdf = url.toLowerCase().includes('.pdf');
             
-            // Adaptar enlace si es de Dropbox para que se vea directamente en la página
             let finalUrl = url;
             if (finalUrl.includes("dropbox.com")) {
-                // Limpiamos los parámetros de descarga originales que suele traer Dropbox
-                finalUrl = finalUrl.replace(/[?&]dl=[01]/g, "");
+                // Limpiamos los parámetros de descarga originales que provocan la autodescarga
+                finalUrl = finalUrl.replace(/[?&]dl=[01]/g, "").replace(/[?&]raw=[01]/g, "");
                 
-                if (isPdf) {
-                    // Para PDFs: agregamos raw=1 para que el iframe lea el documento puro
-                    finalUrl += (finalUrl.includes("?") ? "&raw=1" : "?raw=1");
-                } else {
-                    // Para Imágenes: cambiamos el subdominio a contenido directo
-                    finalUrl = finalUrl.replace("www.dropbox.com", "dl.dropboxusercontent.com");
-                }
+                // Forzamos el dominio a contenido directo necesario para ser leído externamente
+                finalUrl = finalUrl.replace("www.dropbox.com", "dl.dropboxusercontent.com");
             }
             
             if (isPdf) {
-                // PDF usa sus propios controles táctiles nativos del celular
+                // Para PDF ocultamos el zoom de imagen manual
                 scoreZoomIn.style.display = 'none';
                 scoreZoomOut.style.display = 'none';
                 
-                // Ocultamos la barra superior para evitar descargas
-                const pdfParams = "#toolbar=0&navpanes=0";
-                finalUrl += finalUrl.includes("#") ? "" : pdfParams;
-                
-                scoreBody.innerHTML = `<iframe src="${finalUrl}"></iframe>`;
+                // USAMOS GOOGLE DOCS VIEWER: 
+                // Convierte el PDF a un visor HTML incrustado evitando la descarga automática del navegador
+                const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(finalUrl)}&embedded=true`;
+                scoreBody.innerHTML = `<iframe src="${viewerUrl}"></iframe>`;
             } else {
                 scoreZoomIn.style.display = 'flex';
                 scoreZoomOut.style.display = 'flex';
-                // Bloqueamos el clic derecho / mantener presionado para guardar
+                // Para imágenes, bloqueamos el clic derecho
                 scoreBody.innerHTML = `<img id="scoreImage" src="${finalUrl}" oncontextmenu="return false;" />`;
             }
             
@@ -1180,13 +1173,11 @@
             refModalTitle.innerText = song.title;
             let html = '';
             
-            // Renderiza los temas y el nuevo botón de partitura si el atributo existe
             let themeHtml = '';
             if (song.temas && song.temas.length > 0) {
                 themeHtml += `<span>Tema(s): <span>${song.temas.join(", ")}</span></span>`;
             }
             
-            // Aquí se añade el botón
             if (song.partitura) {
                 themeHtml += `
                 <button class="view-score-btn" onclick="openScore(event, '${song.partitura}')">
