@@ -638,7 +638,7 @@
         }
         .score-header .close-btn:hover { color: #f7d694; background: transparent; }
         
-        /* Contenedor scrolleable (modo continuo) */
+        /* Contenedor scrolleable */
         .score-body {
             flex: 1;
             overflow: auto; 
@@ -648,15 +648,13 @@
             padding: 15px;
         }
         
-        /* Las páginas del PDF (Canvases) */
+        /* Oculta los bordes dentados y deja que fluya natural */
         .score-body canvas {
             display: inline-block;
             margin: 0 auto 15px auto; 
             background: #fff;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             max-width: none; 
-            /* SE ELIMINÓ image-rendering para permitir que el navegador aplique 
-               su suavizado natural y vectorial al reescalar el canvas HD */
         }
         
         .score-body img {
@@ -990,7 +988,6 @@
     <!-- Modal para ver partituras e imágenes en pantalla completa -->
     <div class="score-modal" id="scoreModal">
         <div class="score-header">
-            <!-- Botones de Zoom centrados a la lógica natural -->
             <button id="scoreZoomOut" title="Alejar (Zoom Out)">-</button>
             <button id="scoreZoomIn" title="Acercar (Zoom In)">+</button>
             <button class="close-btn" id="closeScoreModal">&times;</button>
@@ -1128,7 +1125,7 @@
         const scoreZoomOut = document.getElementById('scoreZoomOut');
         
         /* ----------------------------------------------------
-           LÓGICA NATIVA DE PDF.JS (CALIDAD VECTORIAL DEFINITIVA)
+           LÓGICA NATIVA DE PDF.JS (RESOLUCIÓN VECTORIAL NATIVA)
            ---------------------------------------------------- */
         
         const pdfjsLib = window['pdfjs-dist/build/pdf'];
@@ -1140,16 +1137,15 @@
         let currentScale = null;
         let currentImgWidth = 100;
         
-        // Renderiza todas las páginas hacia abajo (Scroll continuo con Sobremuestreo Extremo)
+        // Renderiza todas las páginas hacia abajo secuencialmente
         async function renderAllPages() {
             if (!pdfDoc) return;
             scoreBody.innerHTML = ''; 
             
-            // 🔥 LA MAGIA: Forzamos mínimo 3x (o 4x si es móvil de alta gama) de resolución interna
-            // Esto asegura que incluso en un monitor de escritorio estándar de 1080p, 
-            // el lienzo se dibuje en altísima resolución y luego se reduzca, viéndose idéntico a un vector.
-            const basePixelRatio = window.devicePixelRatio || 1;
-            const outputScale = Math.max(basePixelRatio, 3); 
+            // Determinamos la resolución base.
+            // En PC (devicePixelRatio 1), forzamos mínimo 2.5x interno para lograr calidad vectorial perfecta.
+            const deviceRatio = window.devicePixelRatio || 1;
+            const hdRatio = deviceRatio === 1 ? 2.5 : Math.max(deviceRatio, 2); 
             
             for (let num = 1; num <= pdfDoc.numPages; num++) {
                 const page = await pdfDoc.getPage(num);
@@ -1158,39 +1154,42 @@
                 if (num === 1 && !currentScale) {
                     const containerWidth = scoreBody.clientWidth;
                     const unscaledViewport = page.getViewport({scale: 1});
-                    currentScale = (containerWidth - 30) / unscaledViewport.width; 
+                    
+                    // Limitamos el ancho MÁXIMO en escritorio para que la Memoria Ram y GPU no colapsen 
+                    // intentando dibujar un lienzo de más de 5000px de ancho.
+                    let targetWidth = containerWidth - 30;
+                    if (targetWidth > 900) targetWidth = 900; 
+
+                    currentScale = targetWidth / unscaledViewport.width; 
                     if (currentScale < 0.5) currentScale = 0.5;
-                    if (currentScale > 3.0) currentScale = 3.0;
                 }
                 
-                const viewport = page.getViewport({scale: currentScale});
+                // Viewport CSS (Tamaño visual normal en pantalla)
+                const cssViewport = page.getViewport({scale: currentScale});
                 
-                // Creamos un canvas por cada página del PDF
+                // Viewport HD (Resolución interna gigantesca y 100% nítida)
+                const renderViewport = page.getViewport({scale: currentScale * hdRatio});
+                
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
-                // Tamaño interno (Super Resolución)
-                canvas.width = Math.floor(viewport.width * outputScale);
-                canvas.height = Math.floor(viewport.height * outputScale);
+                // Tamaño físico (Super Resolución)
+                canvas.width = Math.floor(renderViewport.width);
+                canvas.height = Math.floor(renderViewport.height);
                 
-                // Tamaño visual CSS (Tamaño Normal)
-                canvas.style.width = Math.floor(viewport.width) + "px";
-                canvas.style.height = Math.floor(viewport.height) + "px";
+                // Tamaño visual CSS (Tamaño Ajustado)
+                canvas.style.width = Math.floor(cssViewport.width) + "px";
+                canvas.style.height = Math.floor(cssViewport.height) + "px";
                 
                 scoreBody.appendChild(canvas);
                 
-                // Aplicamos la transformación de la escala hiper-detallada
-                const transform = outputScale !== 1 
-                    ? [outputScale, 0, 0, outputScale, 0, 0] 
-                    : null;
-
                 const renderContext = {
                     canvasContext: ctx,
-                    transform: transform,
-                    viewport: viewport
+                    viewport: renderViewport // El motor dibuja a lo grande y se comprime en CSS
                 };
                 
-                page.render(renderContext);
+                // Usamos "await" (Promesa) para que dibuje de 1 en 1 sin congelar la ventana
+                await page.render(renderContext).promise;
             }
         }
 
@@ -1215,7 +1214,7 @@
                 currentScale = null; 
                 pdfDoc = null;
                 
-                // Extraer el archivo PDF e iniciar Renderizado en Alta Calidad Vectorial
+                // Extraer y Renderizar con motor vectorial
                 pdfjsLib.getDocument(finalUrl).promise.then(function(pdfDoc_) {
                     pdfDoc = pdfDoc_;
                     renderAllPages();
