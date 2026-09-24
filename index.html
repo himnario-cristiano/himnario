@@ -156,7 +156,7 @@
         }
         .fs-row button:hover { background: #f7d694; color: #000; }
 
-        #fsDisplay {
+        #fsDisplay #szDisplay{
             color: #fff;
             font-size: 14px;
             font-weight: 600;
@@ -674,30 +674,35 @@
         }
         .score-zoom-panel.show { display: flex; }
         
-        /* Contenedor scrolleable - REESCRITO PARA EVITAR CORTE A LA IZQUIERDA */
+        /* Contenedor scrolleable - REVISADO PARA EVITAR CORTE A LA IZQUIERDA Y MEJORAR EN MÓVILES */
         .score-body {
             flex: 1;
             overflow: auto; 
-            display: block; 
             background: #121212;
+            -webkit-overflow-scrolling: touch; /* Suaviza el scroll en iOS */
+        }
+        
+        /* Envoltorio (Wrapper) estilo 'table' que fuerza a que el contenido se centre SI cabe,
+           pero lo empuja desde la izquierda SI es más ancho (16:9), evitando que se corte el borde izquierdo */
+        .canvas-wrapper {
+            display: table;
+            margin: 0 auto;
             padding: 15px;
-            /* Se ha eliminado text-align: center para evitar que el lado izquierdo se oculte en anchos grandes */
         }
         
         .score-body canvas {
-            display: block; /* Convertido a block para que el margin auto respete el scroll */
-            margin: 0 auto 15px auto; 
+            display: block;
+            margin-bottom: 15px; 
             background: #fff;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
             max-width: none; 
         }
         
         .score-body img {
-            display: block; /* Convertido a block */
+            display: block;
             margin: 0 auto 15px auto;
             width: 100%;
             max-width: 100%;
-            transition: width 0.2s, max-width 0.2s;
             -webkit-user-drag: none;
             user-select: none;
         }
@@ -1217,9 +1222,17 @@
             if (!pdfDoc) return;
             scoreBody.innerHTML = ''; 
             
+            // Limitamos la densidad de píxeles en móviles para evitar que el navegador se quede sin memoria RAM
+            // y "saltee" (deje en blanco) las páginas al hacer renderizado de múltiples lienzos pesados.
+            const isMobile = window.innerWidth <= 768;
             const deviceRatio = window.devicePixelRatio || 1;
-            const hdRatio = deviceRatio === 1 ? 2.5 : Math.max(deviceRatio, 2); 
+            const hdRatio = isMobile ? 1.2 : Math.max(deviceRatio, 2); 
             
+            // Creamos el contenedor "table" para que los canvas no recorten el lado izquierdo en PDFs 16:9
+            const wrapper = document.createElement('div');
+            wrapper.className = 'canvas-wrapper';
+            scoreBody.appendChild(wrapper);
+
             for (let num = 1; num <= pdfDoc.numPages; num++) {
                 const page = await pdfDoc.getPage(num);
                 
@@ -1227,7 +1240,6 @@
                     const containerWidth = scoreBody.clientWidth;
                     const unscaledViewport = page.getViewport({scale: 1});
                     
-                    // Incrementamos el margen a 40px para evitar el desborde por el espacio de la barra de desplazamiento lateral
                     let targetWidth = containerWidth - 40; 
                     if (targetWidth > 1200) targetWidth = 1200; 
 
@@ -1248,7 +1260,7 @@
                 canvas.style.width = Math.floor(cssViewport.width) + "px";
                 canvas.style.height = Math.floor(cssViewport.height) + "px";
                 
-                scoreBody.appendChild(canvas);
+                wrapper.appendChild(canvas);
                 
                 const renderContext = { canvasContext: ctx, viewport: renderViewport };
                 await page.render(renderContext).promise;
@@ -1291,7 +1303,7 @@
                     scoreBody.innerHTML = '<p style="color:#fff; padding:20px; text-align:center;">Error al cargar el PDF. Verifica tu conexión a internet.</p>';
                 });
             } else {
-                scoreBody.innerHTML = `<img id="scoreImage" src="${finalUrl}" style="width: 100%;" oncontextmenu="return false;" />`;
+                scoreBody.innerHTML = `<div class="canvas-wrapper"><img id="scoreImage" src="${finalUrl}" style="width: 100%;" oncontextmenu="return false;" /></div>`;
             }
             
             scoreModal.classList.add('show');
