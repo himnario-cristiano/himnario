@@ -854,6 +854,7 @@
         </div>
     </div>
     
+    <!-- SISTEMA ÚNICO DE AUDIO. Eliminar el audioPlayer2 evita bloqueos del MediaSession en iOS y Android. -->
     <audio id="audioPlayer1" class="audio-engine" preload="auto" playsinline webkit-playsinline></audio>
 
     <div class="player-container">
@@ -970,17 +971,17 @@
     <!-- Modal para ver partituras e imágenes en pantalla completa -->
     <div class="score-modal" id="scoreModal">
         <div class="score-header">
-            <!-- La X alineada a la izquierda/derecha usando margen en CSS -->
             <button class="close-btn" id="closeScoreModal">&times;</button>
             <button id="scoreZoomOut" title="Alejar (Zoom Out)">-</button>
             <button id="scoreZoomIn" title="Acercar (Zoom In)">+</button>
         </div>
         <div class="score-body" id="scoreBody"></div>
     </div>
-
+    
     <script src="songs.js"></script>
     
     <script>
+        // --- SISTEMA DE AUDIO ÚNICO CORREGIDO PARA SEGUNDO PLANO ---
         let activeAudio = document.getElementById("audioPlayer1");
         let isGlobalAudioUnlocked = false;
 
@@ -1066,6 +1067,7 @@
         const iconBookSvg = `<svg viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/></svg>`;
         const iconDotsSvg = `<svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>`;
 
+        // UI & Filtros
         function initThemeFilter() {
             let allThemes = [];
             songs.forEach(song => {
@@ -1101,7 +1103,7 @@
         const refModalTitle = document.getElementById('refModalTitle');
         const refModalBody = document.getElementById('refModalBody');
 
-        /* LÓGICA DE PARTITURA/PDF AÑADIDA AQUÍ */
+        /* LÓGICA DE PARTITURA/PDF COMPATIBLE CON DROPBOX */
         const scoreModal = document.getElementById('scoreModal');
         const scoreBody = document.getElementById('scoreBody');
         const closeScoreModal = document.getElementById('closeScoreModal');
@@ -1116,19 +1118,36 @@
             
             const isPdf = url.toLowerCase().includes('.pdf');
             
+            // Adaptar enlace si es de Dropbox para que se vea directamente en la página
+            let finalUrl = url;
+            if (finalUrl.includes("dropbox.com")) {
+                // Limpiamos los parámetros de descarga originales que suele traer Dropbox
+                finalUrl = finalUrl.replace(/[?&]dl=[01]/g, "");
+                
+                if (isPdf) {
+                    // Para PDFs: agregamos raw=1 para que el iframe lea el documento puro
+                    finalUrl += (finalUrl.includes("?") ? "&raw=1" : "?raw=1");
+                } else {
+                    // Para Imágenes: cambiamos el subdominio a contenido directo
+                    finalUrl = finalUrl.replace("www.dropbox.com", "dl.dropboxusercontent.com");
+                }
+            }
+            
             if (isPdf) {
-                // PDF no necesita botones propios de zoom porque usa los nativos
+                // PDF usa sus propios controles táctiles nativos del celular
                 scoreZoomIn.style.display = 'none';
                 scoreZoomOut.style.display = 'none';
                 
-                // #toolbar=0&navpanes=0 bloquea botones de guardado directo
-                const pdfUrl = url.includes('#') ? url : url + '#toolbar=0&navpanes=0';
-                scoreBody.innerHTML = `<iframe src="${pdfUrl}"></iframe>`;
+                // Ocultamos la barra superior para evitar descargas
+                const pdfParams = "#toolbar=0&navpanes=0";
+                finalUrl += finalUrl.includes("#") ? "" : pdfParams;
+                
+                scoreBody.innerHTML = `<iframe src="${finalUrl}"></iframe>`;
             } else {
                 scoreZoomIn.style.display = 'flex';
                 scoreZoomOut.style.display = 'flex';
-                // oncontextmenu="return false;" previene dar clic derecho/pulsar prolongadamente para descargar
-                scoreBody.innerHTML = `<img id="scoreImage" src="${url}" oncontextmenu="return false;" />`;
+                // Bloqueamos el clic derecho / mantener presionado para guardar
+                scoreBody.innerHTML = `<img id="scoreImage" src="${finalUrl}" oncontextmenu="return false;" />`;
             }
             
             scoreModal.classList.add('show');
@@ -1162,13 +1181,11 @@
             refModalTitle.innerText = song.title;
             let html = '';
             
-            // Renderiza los temas y el nuevo botón de partitura si el atributo existe
             let themeHtml = '';
             if (song.temas && song.temas.length > 0) {
                 themeHtml += `<span>Tema(s): <span>${song.temas.join(", ")}</span></span>`;
             }
             
-            // Aquí se añade el botón
             if (song.partitura) {
                 themeHtml += `
                 <button class="view-score-btn" onclick="openScore(event, '${song.partitura}')">
@@ -1180,7 +1197,7 @@
             if (themeHtml) {
                 html += `<div class="ref-theme-badge">${themeHtml}</div>`;
             }
-            
+
             if (song.references && song.references.length > 0) {
                 html += '<ul class="ref-list">';
                 song.references.forEach(ref => { html += `<li class="ref-item"><span class="ref-hymnal">${ref.hymnal}</span><span class="ref-number">#${ref.number}</span></li>`; });
@@ -1188,7 +1205,6 @@
             } else { 
                 html += '<p style="text-align:center; padding: 20px 0; color: #b3b3b3;">No hay referencias a otros himnarios para esta canción.</p>'; 
             }
-            
             refModalBody.innerHTML = html;
             refModal.classList.add('show');
         };
@@ -1538,6 +1554,7 @@
             requestAudioPlay(activeAudio);
         }
 
+        // --- SISTEMA CORREGIDO ---
         function transitionToNext(manualClick = false) {
             const filtered = getFilteredIndices();
             if (filtered.length === 0) return;
@@ -1550,6 +1567,7 @@
             renderPlaylist();
             updateMediaSession(song);
 
+            // Reutilizar EXACTAMENTE el mismo reproductor mantiene viva la MediaSession con la pantalla apagada
             activeAudio.src = formatDropboxStreamUrl(song.src);
             activeAudio.load(); 
 
@@ -1559,6 +1577,7 @@
                 backgroundPlaybackExpected = true;
                 updatePlayButton(true);
                 setMediaPlaybackState('playing');
+                // Esto obliga a iniciar síncronamente respetando el control en segundo plano del SO
                 requestAudioPlay(activeAudio); 
             }
         }
