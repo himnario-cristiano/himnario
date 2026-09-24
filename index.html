@@ -610,7 +610,7 @@
             height: 55px;
             background: #1e1e1e;
             display: flex;
-            justify-content: flex-end; /* Alinea los botones a la derecha */
+            justify-content: flex-end;
             align-items: center;
             padding: 0 15px;
             gap: 10px;
@@ -642,19 +642,23 @@
         .score-body {
             flex: 1;
             overflow: auto; 
-            display: block; /* Bloque normal para que no recorte al hacer zoom horizontalmente */
+            display: block; 
             text-align: center;
             background: #121212;
             padding: 15px;
         }
         
-        /* Las páginas del PDF (Canvases) se comportan como bloques uno debajo del otro */
+        /* Las páginas del PDF (Canvases) */
         .score-body canvas {
             display: inline-block;
-            margin: 0 auto 15px auto; /* Centrado y con margen inferior */
+            margin: 0 auto 15px auto; 
             background: #fff;
             box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            max-width: none; /* Importante para permitir zoom horizontal */
+            max-width: none; 
+            /* Importante para no perder la alta resolución */
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
         }
         
         .score-body img {
@@ -1126,7 +1130,7 @@
         const scoreZoomOut = document.getElementById('scoreZoomOut');
         
         /* ----------------------------------------------------
-           LÓGICA NATIVA DE PDF.JS (SCROLL CONTINUO VERTICAL)
+           LÓGICA NATIVA DE PDF.JS (CALIDAD HD + SCROLL)
            ---------------------------------------------------- */
         
         const pdfjsLib = window['pdfjs-dist/build/pdf'];
@@ -1138,19 +1142,22 @@
         let currentScale = null;
         let currentImgWidth = 100;
         
-        // Renderiza todas las páginas hacia abajo (Scroll continuo)
+        // Renderiza todas las páginas hacia abajo (Scroll continuo con Alta Calidad)
         async function renderAllPages() {
             if (!pdfDoc) return;
             scoreBody.innerHTML = ''; 
             
+            // Detecta la densidad de píxeles de la pantalla (2 para retina/móviles, 1 para monitores normales)
+            const outputScale = window.devicePixelRatio || 1;
+            
             for (let num = 1; num <= pdfDoc.numPages; num++) {
                 const page = await pdfDoc.getPage(num);
                 
-                // Calcula el zoom automáticamente la primera vez basado en la pantalla del celular
+                // Calcula el zoom inicial
                 if (num === 1 && !currentScale) {
                     const containerWidth = scoreBody.clientWidth;
                     const unscaledViewport = page.getViewport({scale: 1});
-                    currentScale = (containerWidth - 30) / unscaledViewport.width; // 30px compensación scroll/padding
+                    currentScale = (containerWidth - 30) / unscaledViewport.width; 
                     if (currentScale < 0.5) currentScale = 0.5;
                     if (currentScale > 3.0) currentScale = 3.0;
                 }
@@ -1160,18 +1167,29 @@
                 // Creamos un canvas por cada página del PDF
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
                 
-                // Inyectamos el nuevo canvas al contenedor para hacer la lista hacia abajo
+                // Magia para HD: El canvas físico es el doble o triple de grande
+                canvas.width = Math.floor(viewport.width * outputScale);
+                canvas.height = Math.floor(viewport.height * outputScale);
+                
+                // El tamaño visual (CSS) se mantiene normal
+                canvas.style.width = Math.floor(viewport.width) + "px";
+                canvas.style.height = Math.floor(viewport.height) + "px";
+                
                 scoreBody.appendChild(canvas);
                 
+                // Aplicamos la transformación de la escala de la pantalla al contexto del dibujo
+                const transform = outputScale !== 1 
+                    ? [outputScale, 0, 0, outputScale, 0, 0] 
+                    : null;
+
                 const renderContext = {
                     canvasContext: ctx,
+                    transform: transform,
                     viewport: viewport
                 };
                 
-                page.render(renderContext); // Se renderizan secuencialmente
+                page.render(renderContext);
             }
         }
 
@@ -1183,7 +1201,6 @@
             
             let finalUrl = url;
             if (finalUrl.includes("dropbox.com")) {
-                // Convertir enlaces DropBox a directos
                 finalUrl = finalUrl.replace(/[?&]dl=[01]/g, "").replace(/[?&]raw=[01]/g, "");
                 finalUrl = finalUrl.replace("www.dropbox.com", "dl.dropboxusercontent.com");
             }
@@ -1197,7 +1214,7 @@
                 currentScale = null; 
                 pdfDoc = null;
                 
-                // Extraer el archivo PDF e iniciar Renderizado en Scroll
+                // Extraer el archivo PDF e iniciar Renderizado en Alta Calidad
                 pdfjsLib.getDocument(finalUrl).promise.then(function(pdfDoc_) {
                     pdfDoc = pdfDoc_;
                     renderAllPages();
@@ -1223,16 +1240,16 @@
             pdfDoc = null; 
         });
 
-        // Controles de ZOOM (Unificados para Imágenes y Todos los Canvas del PDF)
+        // Controles de ZOOM
         scoreZoomIn.addEventListener('click', () => {
             const img = document.getElementById('scoreImage');
             if (img) {
                 currentImgWidth += 20;
                 img.style.width = `${currentImgWidth}%`;
-                img.style.maxWidth = 'none'; // Desbloquea para scroll horizontal libre
+                img.style.maxWidth = 'none'; 
             } else if (pdfDoc) {
                 currentScale += 0.25;
-                renderAllPages(); // Re-dibuja todas las hojas más grandes
+                renderAllPages(); 
             }
         });
 
@@ -1243,7 +1260,7 @@
                 img.style.width = `${currentImgWidth}%`;
             } else if (pdfDoc && currentScale > 0.5) {
                 currentScale -= 0.25;
-                renderAllPages(); // Re-dibuja todas las hojas más pequeñas
+                renderAllPages(); 
             }
         });
 
