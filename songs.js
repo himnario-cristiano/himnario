@@ -6,7 +6,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "https://dl.dropboxusercontent.com/scl/fi/s2wd747r9ug5h0zm3csie/189-Bienvenido.pdf?rlkey=figf82x8ixkq9w4l4jr8dhb3s&st=610sgpou&dl=0",
+        		partitura: "https://www.dropbox.com/scl/fi/knsixgm70tjwt2a9d3fc3/0-Himno-De-Bienvenida-Figuras.pdf?rlkey=olqh4ri1kg3ziow3t830p7ti5&st=oc6tq5fu&dl=0",
                 src: "https://www.dropbox.com/scl/fi/wysxwxko1a5sdj40d8jjo/001.-Himno-de-Bienvenida.mp3?rlkey=5jbqnsjum1xdeu29nwbult0pi&st=50ccjm4n&dl=0",
                  references: [
                     { hymnal: "Cantos Del Camino", number: "189" },
@@ -19,7 +19,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/qbu314n36icjlk88ttzj2/0-La-Doxolog-a_-A-Dios-El-Padre-Figuras.pdf?rlkey=bdjajwuymgy7c33enbh5z3fal&st=t8966axb&dl=0",
                 src: "https://www.dropbox.com/scl/fi/u1l57ac9l4mctwdb9bctg/002.-A-Dios-El-Padre-Doxolog-a.mp3?rlkey=6k68av5wpqxummatraiax589z&st=1izah88j&dl=0",
 				
                 references: [
@@ -32,7 +32,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/eh7nv0sf3bqru130saixj/01-Iglesia-De-Cristo-Figuras.pdf?rlkey=7q4qnr1yfi79wou4tv4xhw106&st=dgnalp93&dl=0",
                 src: "https://www.dropbox.com/scl/fi/cw9qm55lszfo3490krqom/003.-Iglesia-De-Cristo.mp3?rlkey=tm4nzijzysn2d8ibqwekdoyec&st=2jc7smd9&dl=0",
                 references: [
 					
@@ -43,7 +43,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/vbtnsi5szv1gbqz4njeyn/02-Canta-Oh-Buen-Cristiano-Figuras.pdf?rlkey=e7tr2ys85s67ct6uwbfvreaf0&st=c1zdw6dr&dl=0",
                 src: "https://www.dropbox.com/scl/fi/nlvx3mays034k9jx6ohr2/004.-Canta-Oh-Buen-Cristiano.mp3?rlkey=9u6w4bphunit38jffpkkund9i&st=gdla5fvb&dl=0",
                 references: [
 					
@@ -54,7 +54,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/qh7kg4g9ud3tjio8k4czg/03-Invocacion-A-La-Trinidad-Figuras.pdf?rlkey=xc5hs8o3qt778qudxlmppuv64&st=1ffegrkv&dl=0",
                 src: "https://www.dropbox.com/scl/fi/idnu2rlhzjv7ksxsaiki7/005.-Invocaci-n-A-La-Trinidad.mp3?rlkey=53d8u745fwbo7ctbfskqj22nk&st=guxplm9g&dl=0",
                 references: [
 					
@@ -76,7 +76,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/09omrbr4t01zvrqsvt9lo/04-No-Te-D-Temor-Hablar-Por-Cristo-Figuras.pdf?rlkey=hqpn4jci4ux932kgzccvwkpg1&st=gwcq9kyk&dl=0",
                 src: "https://www.dropbox.com/scl/fi/h403rqflfp9nc38vas5tu/007.-No-Te-De-Temor.mp3?rlkey=ugx88evggtap899y8a69pglat&st=dxxcs44t&dl=0",
                 references: [
 					
