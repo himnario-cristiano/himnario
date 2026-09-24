@@ -73,7 +73,7 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         }
 
-        /* BARRA SUTIL INFERIOR EN EL NAVBAR */
+        /* BARRA SUTIL DE PROGRESO (Reutilizable) */
         .navbar-progress-bar {
             position: absolute;
             bottom: -1px; /* Para superponerse exactamente al borde inferior */
@@ -963,7 +963,7 @@
                 </button>
             </div>
 
-            <!-- BARRA DE PROGRESO SUTIL EN EL BORDE INFERIOR -->
+            <!-- BARRA DE PROGRESO SUTIL EN EL BORDE INFERIOR DEL REPRODUCTOR PRINCIPAL -->
             <div class="navbar-progress-bar" id="navbarProgress"></div>
         </div>
 
@@ -1032,6 +1032,9 @@
                 </div>
                 <button class="sz-reset" id="szReset">Restablecer 100%</button>
             </div>
+            
+            <!-- BARRA DE PROGRESO SUTIL EN EL BORDE INFERIOR DEL VISOR PDF -->
+            <div class="navbar-progress-bar" id="scoreProgressBar"></div>
         </div>
         
         <div class="score-body" id="scoreBody"></div>
@@ -1092,7 +1095,8 @@
         const modeBtn = document.getElementById("modeBtn");
         const progressBar = document.getElementById("progressBar");
         const progressArea = document.getElementById("progressArea");
-        const navbarProgress = document.getElementById("navbarProgress"); // Barra sutil extraída del DOM
+        const navbarProgress = document.getElementById("navbarProgress"); 
+        const scoreProgressBar = document.getElementById("scoreProgressBar"); // Nueva barra en el visor
         const currTimeEl = document.getElementById("currTime");
         const totalTimeEl = document.getElementById("totalTime");
         const searchInput = document.getElementById("searchInput");
@@ -1751,11 +1755,11 @@
                 if (!Number.isFinite(duration) || duration <= 0) return;
                 const progressPercent = Math.min(100, Math.max(0, (currentTime / duration) * 100));
                 
-                // Actualiza la barra normal
                 progressBar.style.width = `${progressPercent}%`;
-                
-                // Actualiza la nueva barra sutil del Navbar
                 if(navbarProgress) navbarProgress.style.width = `${progressPercent}%`;
+                
+                // Actualiza la barra del modal del PDF
+                if(scoreProgressBar) scoreProgressBar.style.width = `${progressPercent}%`;
 
                 let currMins = Math.floor(currentTime / 60);
                 let currSecs = Math.floor(currentTime % 60);
