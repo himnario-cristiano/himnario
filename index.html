@@ -18,6 +18,10 @@
     <meta name="apple-mobile-web-app-orientation" content="portrait">
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Librería PDF.js para renderizar PDFs de forma nativa y sin botones externos -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
     <style>
         :root {
             --text-scale: 1; 
@@ -570,7 +574,6 @@
             font-weight: 600;
         }
 
-        /* Botón de ver partitura */
         .view-score-btn {
             background: #f7d694;
             color: #000;
@@ -586,7 +589,7 @@
         }
         .view-score-btn:hover { background: #e5c483; transform: scale(1.05); }
 
-        /* Estilos Visor de Partitura Pantalla Completa */
+        /* Estilos Visor Pantalla Completa (PDF/Imágenes) */
         .score-modal {
             position: fixed;
             top: 0; left: 0; width: 100vw; height: 100vh;
@@ -602,17 +605,19 @@
             opacity: 1;
             pointer-events: auto;
         }
+        
         .score-header {
             height: 55px;
             background: #1e1e1e;
             display: flex;
-            justify-content: flex-end;
+            justify-content: flex-end; /* Alinea todo a la derecha hacia la X */
             align-items: center;
             padding: 0 15px;
-            gap: 10px;
+            gap: 8px;
             border-bottom: 1px solid #3e3e3e;
             flex-shrink: 0;
         }
+        
         .score-header button {
             background: #333;
             color: #fff;
@@ -625,39 +630,59 @@
             transition: background 0.2s;
         }
         .score-header button:hover { background: #f7d694; color: #000; }
-        .score-header .close-btn { background: transparent; font-size: 32px; color: #b3b3b3; margin-left: auto;}
-        .score-header .close-btn:hover { color: #f7d694; background: transparent; }
+        .score-header button:disabled { opacity: 0.4; cursor: not-allowed; }
         
-        .score-body {
-            flex: 1;
-            overflow: auto;
+        /* Botón de cerrar, ahora en el flujo normal (a la derecha) */
+        .score-header .close-btn { 
+            background: transparent; 
+            font-size: 32px; 
+            color: #b3b3b3; 
+        }
+        .score-header .close-btn:hover { color: #f7d694; background: transparent; }
+
+        /* Controles específicos de Paginación de PDF */
+        .pdf-controls {
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            position: relative;
-            background: #121212;
+            align-items: center;
+            gap: 6px;
         }
-        .score-body iframe {
-            width: 100%; height: 100%; border: none;
-        }
-        .score-body img {
-            width: 100%;
-            max-width: none;
-            transition: width 0.2s;
-            /* Previene el arrastre de imagen para guardar */
-            -webkit-user-drag: none;
+        .pdf-controls button { font-size: 16px; font-weight: bold; }
+        
+        #pdfPageInfo {
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 45px;
+            text-align: center;
             user-select: none;
         }
         
-        /* PARCHE PARA OCULTAR EL BOTÓN EXTERNO DEL PDF */
-        .pdf-patch {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 55px;
-            height: 55px;
-            background-color: #323639; /* Color exacto de la barra oscura de Docs Viewer */
-            z-index: 10;
+        .score-body {
+            flex: 1;
+            overflow: auto; 
+            display: flex;
+            justify-content: flex-start; /* Permite hacer scroll libremente cuando el pdf o imagen crece */
+            align-items: flex-start;
+            position: relative;
+            background: #121212;
+            padding: 15px;
+        }
+        
+        /* Canvas de PDF rendering */
+        .score-body canvas {
+            margin: 0 auto;
+            background: #fff;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        
+        /* Imágen fallback */
+        .score-body img {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 100%;
+            transition: width 0.2s, max-width 0.2s;
+            -webkit-user-drag: none;
+            user-select: none;
         }
 
         #refModalBody {
@@ -768,11 +793,6 @@
                 flex-direction: row;
                 gap: 2px;
                 animation: slideInRight 0.2s ease;
-            }
-            /* Reducir el parche un poco en celulares pequeños por si la barra se escala */
-            .pdf-patch {
-                width: 50px;
-                height: 50px;
             }
         }
         
@@ -986,9 +1006,16 @@
     <!-- Modal para ver partituras e imágenes en pantalla completa -->
     <div class="score-modal" id="scoreModal">
         <div class="score-header">
-            <button class="close-btn" id="closeScoreModal">&times;</button>
+            <!-- Nuevos botones de paginación que se mostrarán solo para PDFs -->
+            <div class="pdf-controls" id="pdfControls" style="display: none;">
+                <button id="pdfPrev" title="Página Anterior">&lt;</button>
+                <span id="pdfPageInfo">1 / 1</span>
+                <button id="pdfNext" title="Página Siguiente">&gt;</button>
+            </div>
+            
             <button id="scoreZoomOut" title="Alejar (Zoom Out)">-</button>
             <button id="scoreZoomIn" title="Acercar (Zoom In)">+</button>
+            <button class="close-btn" id="closeScoreModal">&times;</button>
         </div>
         <div class="score-body" id="scoreBody"></div>
     </div>
@@ -1121,36 +1148,138 @@
         const closeScoreModal = document.getElementById('closeScoreModal');
         const scoreZoomIn = document.getElementById('scoreZoomIn');
         const scoreZoomOut = document.getElementById('scoreZoomOut');
-        let currentImgWidth = 100;
+        
+        /* ----------------------------------------------------
+           LÓGICA NATIVA DE PDF.JS (Elimina el visor de Google)
+           ---------------------------------------------------- */
+        
+        // Configuramos la ruta del worker de PDF.js
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        if (pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+        }
+        
+        let pdfDoc = null,
+            pageNum = 1,
+            pageRendering = false,
+            pageNumPending = null,
+            currentScale = null;
 
-        /* LÓGICA DE PARTITURA/PDF CON PARCHE VISUAL PARA OCULTAR BOTÓN EXTERNO */
+        let currentImgWidth = 100;
+        
+        // Canvas global para inyectarlo rápidamente
+        const pdfCanvas = document.createElement('canvas');
+        pdfCanvas.style.display = 'block';
+        pdfCanvas.style.margin = '0 auto';
+        const ctx = pdfCanvas.getContext('2d');
+
+        function renderPage(num) {
+            pageRendering = true;
+            
+            pdfDoc.getPage(num).then(function(page) {
+                // Cálculo de escala inicial si es la primera vez que carga
+                if (!currentScale) {
+                    const containerWidth = scoreBody.clientWidth;
+                    const unscaledViewport = page.getViewport({scale: 1});
+                    currentScale = (containerWidth - 30) / unscaledViewport.width; // 30px margen
+                    if (currentScale < 0.5) currentScale = 0.5;
+                    if (currentScale > 3.0) currentScale = 3.0;
+                }
+                
+                const viewport = page.getViewport({scale: currentScale});
+                pdfCanvas.height = viewport.height;
+                pdfCanvas.width = viewport.width;
+
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                const renderTask = page.render(renderContext);
+
+                renderTask.promise.then(function() {
+                    pageRendering = false;
+                    if (pageNumPending !== null) {
+                        renderPage(pageNumPending);
+                        pageNumPending = null;
+                    }
+                });
+            });
+            
+            // Actualizar textos e información
+            document.getElementById('pdfPageInfo').textContent = num + ' / ' + pdfDoc.numPages;
+            document.getElementById('pdfPrev').disabled = (num <= 1);
+            document.getElementById('pdfNext').disabled = (num >= pdfDoc.numPages);
+        }
+
+        function queueRenderPage(num) {
+            if (pageRendering) {
+                pageNumPending = num;
+            } else {
+                renderPage(num);
+            }
+        }
+        
+        // Eventos de Paginación
+        document.getElementById('pdfPrev').addEventListener('click', () => {
+            if (!pdfDoc || pageNum <= 1) return;
+            pageNum--;
+            queueRenderPage(pageNum);
+        });
+
+        document.getElementById('pdfNext').addEventListener('click', () => {
+            if (!pdfDoc || pageNum >= pdfDoc.numPages) return;
+            pageNum++;
+            queueRenderPage(pageNum);
+        });
+
+        /* Abrir el visualizador */
         window.openScore = function(event, url) {
             event.stopPropagation();
-            currentImgWidth = 100;
             scoreBody.innerHTML = '';
             
             const isPdf = url.toLowerCase().includes('.pdf');
             
             let finalUrl = url;
             if (finalUrl.includes("dropbox.com")) {
+                // Transformar URL de Dropbox a descarga directa/Raw
                 finalUrl = finalUrl.replace(/[?&]dl=[01]/g, "").replace(/[?&]raw=[01]/g, "");
                 finalUrl = finalUrl.replace("www.dropbox.com", "dl.dropboxusercontent.com");
             }
             
-            if (isPdf) {
-                scoreZoomIn.style.display = 'none';
-                scoreZoomOut.style.display = 'none';
-                
-                const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(finalUrl)}&embedded=true`;
-                
-                // Agregamos el iframe + el "div parche" superpuesto para bloquear el botón de nueva ventana
-                scoreBody.innerHTML = `
-                    <iframe src="${viewerUrl}"></iframe>
-                    <div class="pdf-patch" title="Modo lectura"></div>
-                `;
-            } else {
+            if (isPdf && pdfjsLib) {
+                // Mostrar controles nativos PDF (alineados al costado de la X)
+                document.getElementById('pdfControls').style.display = 'flex';
                 scoreZoomIn.style.display = 'flex';
                 scoreZoomOut.style.display = 'flex';
+                
+                scoreBody.appendChild(pdfCanvas);
+                
+                // Reiniciar estado
+                currentScale = null; 
+                pageNum = 1;
+                pdfDoc = null;
+                
+                ctx.clearRect(0, 0, pdfCanvas.width, pdfCanvas.height);
+                document.getElementById('pdfPageInfo').textContent = '...';
+                document.getElementById('pdfPrev').disabled = true;
+                document.getElementById('pdfNext').disabled = true;
+                
+                // Extraer directamente del archivo via JS (Soporte CORS en Dropbox nativo)
+                pdfjsLib.getDocument(finalUrl).promise.then(function(pdfDoc_) {
+                    pdfDoc = pdfDoc_;
+                    queueRenderPage(pageNum);
+                }).catch(function(error) {
+                    console.error("Error cargando PDF:", error);
+                    scoreBody.innerHTML = '<p style="color:#fff; padding:20px; text-align:center;">Error al cargar el PDF. Verifica tu conexión a internet.</p>';
+                });
+                
+            } else {
+                // Modo Imagen 
+                document.getElementById('pdfControls').style.display = 'none';
+                scoreZoomIn.style.display = 'flex';
+                scoreZoomOut.style.display = 'flex';
+                currentImgWidth = 100;
                 scoreBody.innerHTML = `<img id="scoreImage" src="${finalUrl}" oncontextmenu="return false;" />`;
             }
             
@@ -1160,21 +1289,30 @@
         closeScoreModal.addEventListener('click', () => {
             scoreModal.classList.remove('show');
             scoreBody.innerHTML = ''; 
+            pdfDoc = null; // Liberar memoria
         });
 
+        // Eventos de Zoom funcionales unificados (Imagen + PDF)
         scoreZoomIn.addEventListener('click', () => {
             const img = document.getElementById('scoreImage');
-            if(img) {
+            if (img) {
                 currentImgWidth += 20;
                 img.style.width = `${currentImgWidth}%`;
+                img.style.maxWidth = 'none';
+            } else if (pdfDoc) {
+                currentScale += 0.25;
+                queueRenderPage(pageNum);
             }
         });
 
         scoreZoomOut.addEventListener('click', () => {
             const img = document.getElementById('scoreImage');
-            if(img && currentImgWidth > 40) {
+            if (img && currentImgWidth > 40) {
                 currentImgWidth -= 20;
                 img.style.width = `${currentImgWidth}%`;
+            } else if (pdfDoc && currentScale > 0.5) {
+                currentScale -= 0.25;
+                queueRenderPage(pageNum);
             }
         });
 
