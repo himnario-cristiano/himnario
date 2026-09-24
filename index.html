@@ -648,6 +648,17 @@
             -webkit-user-drag: none;
             user-select: none;
         }
+        
+        /* PARCHE PARA OCULTAR EL BOTÓN EXTERNO DEL PDF */
+        .pdf-patch {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 55px;
+            height: 55px;
+            background-color: #323639; /* Color exacto de la barra oscura de Docs Viewer */
+            z-index: 10;
+        }
 
         #refModalBody {
             overflow-y: auto;
@@ -757,6 +768,11 @@
                 flex-direction: row;
                 gap: 2px;
                 animation: slideInRight 0.2s ease;
+            }
+            /* Reducir el parche un poco en celulares pequeños por si la barra se escala */
+            .pdf-patch {
+                width: 50px;
+                height: 50px;
             }
         }
         
@@ -970,7 +986,6 @@
     <!-- Modal para ver partituras e imágenes en pantalla completa -->
     <div class="score-modal" id="scoreModal">
         <div class="score-header">
-            <!-- La X alineada a la izquierda/derecha usando margen en CSS -->
             <button class="close-btn" id="closeScoreModal">&times;</button>
             <button id="scoreZoomOut" title="Alejar (Zoom Out)">-</button>
             <button id="scoreZoomIn" title="Acercar (Zoom In)">+</button>
@@ -1101,7 +1116,6 @@
         const refModalTitle = document.getElementById('refModalTitle');
         const refModalBody = document.getElementById('refModalBody');
 
-        /* LÓGICA DE PARTITURA/PDF ACTUALIZADA */
         const scoreModal = document.getElementById('scoreModal');
         const scoreBody = document.getElementById('scoreBody');
         const closeScoreModal = document.getElementById('closeScoreModal');
@@ -1109,7 +1123,7 @@
         const scoreZoomOut = document.getElementById('scoreZoomOut');
         let currentImgWidth = 100;
 
-        /* LÓGICA DE PARTITURA/PDF COMPATIBLE CON DROPBOX Y VISOR NATIVO */
+        /* LÓGICA DE PARTITURA/PDF CON PARCHE VISUAL PARA OCULTAR BOTÓN EXTERNO */
         window.openScore = function(event, url) {
             event.stopPropagation();
             currentImgWidth = 100;
@@ -1119,26 +1133,24 @@
             
             let finalUrl = url;
             if (finalUrl.includes("dropbox.com")) {
-                // Limpiamos los parámetros de descarga originales que provocan la autodescarga
                 finalUrl = finalUrl.replace(/[?&]dl=[01]/g, "").replace(/[?&]raw=[01]/g, "");
-                
-                // Forzamos el dominio a contenido directo necesario para ser leído externamente
                 finalUrl = finalUrl.replace("www.dropbox.com", "dl.dropboxusercontent.com");
             }
             
             if (isPdf) {
-                // Para PDF ocultamos el zoom de imagen manual
                 scoreZoomIn.style.display = 'none';
                 scoreZoomOut.style.display = 'none';
                 
-                // USAMOS GOOGLE DOCS VIEWER: 
-                // Convierte el PDF a un visor HTML incrustado evitando la descarga automática del navegador
                 const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(finalUrl)}&embedded=true`;
-                scoreBody.innerHTML = `<iframe src="${viewerUrl}"></iframe>`;
+                
+                // Agregamos el iframe + el "div parche" superpuesto para bloquear el botón de nueva ventana
+                scoreBody.innerHTML = `
+                    <iframe src="${viewerUrl}"></iframe>
+                    <div class="pdf-patch" title="Modo lectura"></div>
+                `;
             } else {
                 scoreZoomIn.style.display = 'flex';
                 scoreZoomOut.style.display = 'flex';
-                // Para imágenes, bloqueamos el clic derecho
                 scoreBody.innerHTML = `<img id="scoreImage" src="${finalUrl}" oncontextmenu="return false;" />`;
             }
             
@@ -1153,14 +1165,14 @@
         scoreZoomIn.addEventListener('click', () => {
             const img = document.getElementById('scoreImage');
             if(img) {
-                currentImgWidth += 20; // Incrementa ancho un 20%
+                currentImgWidth += 20;
                 img.style.width = `${currentImgWidth}%`;
             }
         });
 
         scoreZoomOut.addEventListener('click', () => {
             const img = document.getElementById('scoreImage');
-            if(img && currentImgWidth > 40) { // Límite para no encogerlo demasiado
+            if(img && currentImgWidth > 40) {
                 currentImgWidth -= 20;
                 img.style.width = `${currentImgWidth}%`;
             }
