@@ -151,7 +151,7 @@
             text-align: center;
         }
 
-        #fsReset {
+        #fsReset, .sz-reset {
             background: transparent;
             color: #b3b3b3;
             border: 1px solid #4f4f4f;
@@ -161,8 +161,9 @@
             font-size: 12px;
             font-weight: 600;
             transition: all 0.2s;
+            text-align: center;
         }
-        #fsReset:hover { background: #4f4f4f; color: #fff; }
+        #fsReset:hover, .sz-reset:hover { background: #4f4f4f; color: #fff; }
 
         .vinyl-wrapper { 
             position: relative; 
@@ -616,27 +617,49 @@
             gap: 10px;
             border-bottom: 1px solid #3e3e3e;
             flex-shrink: 0;
+            position: relative;
         }
         
-        .score-header button {
+        .score-header button.ctrl-btn {
             background: #333;
             color: #fff;
             border: none;
             width: 36px; height: 36px;
             border-radius: 6px;
-            font-size: 20px;
             cursor: pointer;
             display: flex; justify-content: center; align-items: center;
-            transition: background 0.2s;
+            transition: background 0.2s, color 0.2s;
         }
-        .score-header button:hover { background: #f7d694; color: #000; }
+        .score-header button.ctrl-btn:hover { background: #f7d694; color: #000; }
+        .score-header button.ctrl-btn svg { width: 22px; height: 22px; fill: currentColor; }
         
         .score-header .close-btn { 
             background: transparent; 
+            border: none;
             font-size: 32px; 
             color: #b3b3b3; 
+            cursor: pointer;
+            margin-left: 5px;
         }
-        .score-header .close-btn:hover { color: #f7d694; background: transparent; }
+        .score-header .close-btn:hover { color: #f7d694; }
+
+        /* Panel Flotante de Zoom */
+        .score-zoom-panel {
+            display: none;
+            position: absolute;
+            top: 55px; 
+            right: 15px;
+            background: #282828;
+            border: 1px solid #3e3e3e;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            z-index: 3100;
+            flex-direction: column;
+            gap: 12px;
+            min-width: 150px;
+        }
+        .score-zoom-panel.show { display: flex; }
         
         /* Contenedor scrolleable */
         .score-body {
@@ -648,7 +671,6 @@
             padding: 15px;
         }
         
-        /* Oculta los bordes dentados y deja que fluya natural */
         .score-body canvas {
             display: inline-block;
             margin: 0 auto 15px auto; 
@@ -855,20 +877,14 @@
 </head>
 <body>
     <div class="install-banner" id="installBanner">
+        <!-- ... (código del banner omitido por brevedad, no cambia) ... -->
         <div class="install-banner-info">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="#f7d694">
-                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
-            </svg>
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="#f7d694"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
             <div class="install-banner-text">Instalar App Himnario</div>
         </div>
         <div class="install-banner-actions">
-            <button class="btn-install" id="btnInstallApp">
-                <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                <span>Instalar</span>
-            </button>
-            <button class="btn-close-banner" id="btnCloseBanner">
-                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </button>
+            <button class="btn-install" id="btnInstallApp"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg><span>Instalar</span></button>
+            <button class="btn-close-banner" id="btnCloseBanner"><svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg></button>
         </div>
     </div>
     
@@ -939,9 +955,7 @@
         <div class="playlist">
             <div class="playlist-header">
                 <div class="search-container">
-                    <svg viewBox="0 0 24 24" class="search-icon">
-                        <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24" class="search-icon"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
                     <input type="text" id="searchInput" class="search-input" placeholder="Buscar canción..." autocomplete="off">
                 </div>
                 
@@ -950,28 +964,22 @@
                 </select>
 
                 <button class="fav-filter-btn" id="favFilterBtn" title="Filtrar por Favoritos">
-                    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
+                    <svg viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
                 </button>
             </div>
-
             <div id="playlistItems" class="playlist-items-container"></div>
         </div>
     </div>
 
-    <!-- Modales -->
+    <!-- Modales de ayuda y Referencia -->
     <div class="modal-overlay" id="helpModal">
         <div class="modal-content">
             <button class="modal-close" id="closeModalBtn">&times;</button>
             <h3>Soporte Técnico</h3>
             <p>¿Tienes el audio de algún himno que nos falta o deseas compartir alguno para enriquecer el himnario y nuestra playlist?</p>
             <p>Si tienes problemas con el reproductor, sugerencias o audios que compartir, contáctanos directamente a nuestro soporte.</p>
-            
             <button id="btnWhatsappContact" class="whatsapp-btn">
-                <svg viewBox="0 0 24 24" width="22" height="22">
-                    <path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-                </svg>
+                <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 Contactar a Soporte
             </button>
         </div>
@@ -988,10 +996,29 @@
     <!-- Modal para ver partituras e imágenes en pantalla completa -->
     <div class="score-modal" id="scoreModal">
         <div class="score-header">
-            <button id="scoreZoomOut" title="Alejar (Zoom Out)">-</button>
-            <button id="scoreZoomIn" title="Acercar (Zoom In)">+</button>
+            <!-- Botón del Audio en PDF -->
+            <button id="scorePlayPauseBtn" class="ctrl-btn" title="Reproducir/Pausar Himno">
+                <svg viewBox="0 0 24 24" id="scorePlayIcon"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            
+            <!-- Botón Lupa (Abre panel Zoom) -->
+            <button id="scoreZoomToggle" class="ctrl-btn" title="Ajustar Zoom">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+            </button>
+            
             <button class="close-btn" id="closeScoreModal">&times;</button>
+
+            <!-- Panel Flotante de Zoom -->
+            <div class="score-zoom-panel" id="scoreZoomPanel">
+                <div class="fs-row">
+                    <button id="szDecrease">-</button>
+                    <span id="szDisplay">100%</span>
+                    <button id="szIncrease">+</button>
+                </div>
+                <button class="sz-reset" id="szReset">Restablecer 100%</button>
+            </div>
         </div>
+        
         <div class="score-body" id="scoreBody"></div>
     </div>
 
@@ -1044,6 +1071,7 @@
         const artistEl = document.getElementById("artist");
         const playBtn = document.getElementById("playBtn");
         const playIcon = document.getElementById("playIcon");
+        const scorePlayIcon = document.getElementById("scorePlayIcon"); // Icono del visor PDF
         const prevBtn = document.getElementById("prevBtn");
         const nextBtn = document.getElementById("nextBtn");
         const modeBtn = document.getElementById("modeBtn");
@@ -1121,74 +1149,107 @@
         const scoreModal = document.getElementById('scoreModal');
         const scoreBody = document.getElementById('scoreBody');
         const closeScoreModal = document.getElementById('closeScoreModal');
-        const scoreZoomIn = document.getElementById('scoreZoomIn');
-        const scoreZoomOut = document.getElementById('scoreZoomOut');
         
         /* ----------------------------------------------------
-           LÓGICA NATIVA DE PDF.JS (RESOLUCIÓN VECTORIAL NATIVA)
+           LÓGICA NATIVA DE PDF.JS (VECTORIAL) + ZOOM PANEL
            ---------------------------------------------------- */
-        
         const pdfjsLib = window['pdfjs-dist/build/pdf'];
         if (pdfjsLib) {
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
         }
         
         let pdfDoc = null;
-        let currentScale = null;
-        let currentImgWidth = 100;
+        let initialScale = null; // Scale base para el "100%"
+        let currentZoomPercent = 100; // Porcentaje universal
         
-        // Renderiza todas las páginas hacia abajo secuencialmente
+        const scoreZoomToggle = document.getElementById('scoreZoomToggle');
+        const scoreZoomPanel = document.getElementById('scoreZoomPanel');
+        const szDecrease = document.getElementById('szDecrease');
+        const szIncrease = document.getElementById('szIncrease');
+        const szDisplay = document.getElementById('szDisplay');
+        const szReset = document.getElementById('szReset');
+
+        // Toggle del Panel Flotante
+        scoreZoomToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            scoreZoomPanel.classList.toggle('show');
+        });
+
+        // Ocultar panel si clickeamos afuera
+        scoreModal.addEventListener('click', (e) => {
+            if (!scoreZoomPanel.contains(e.target) && !scoreZoomToggle.contains(e.target)) {
+                scoreZoomPanel.classList.remove('show');
+            }
+        });
+
+        function updateScoreZoomDisplay() {
+            szDisplay.innerText = `${currentZoomPercent}%`;
+            const img = document.getElementById('scoreImage');
+            
+            if (img) {
+                img.style.width = `${currentZoomPercent}%`;
+                img.style.maxWidth = 'none'; 
+            } else if (pdfDoc && initialScale) {
+                // Al volver a renderizar con la nueva escala, dibujará la página aplicando el zoom
+                renderAllPages();
+            }
+        }
+
+        szIncrease.addEventListener('click', () => {
+            currentZoomPercent += 25;
+            updateScoreZoomDisplay();
+        });
+
+        szDecrease.addEventListener('click', () => {
+            if (currentZoomPercent > 25) { 
+                currentZoomPercent -= 25;
+                updateScoreZoomDisplay();
+            }
+        });
+
+        szReset.addEventListener('click', () => {
+            currentZoomPercent = 100;
+            updateScoreZoomDisplay();
+        });
+        
         async function renderAllPages() {
             if (!pdfDoc) return;
             scoreBody.innerHTML = ''; 
             
-            // Determinamos la resolución base.
-            // En PC (devicePixelRatio 1), forzamos mínimo 2.5x interno para lograr calidad vectorial perfecta.
             const deviceRatio = window.devicePixelRatio || 1;
             const hdRatio = deviceRatio === 1 ? 2.5 : Math.max(deviceRatio, 2); 
             
             for (let num = 1; num <= pdfDoc.numPages; num++) {
                 const page = await pdfDoc.getPage(num);
                 
-                // Calcula el zoom inicial
-                if (num === 1 && !currentScale) {
+                // Si es la primera carga y no existe Scale 100% definido, calcularlo.
+                if (num === 1 && !initialScale) {
                     const containerWidth = scoreBody.clientWidth;
                     const unscaledViewport = page.getViewport({scale: 1});
-                    
-                    // Limitamos el ancho MÁXIMO en escritorio para que la Memoria Ram y GPU no colapsen 
-                    // intentando dibujar un lienzo de más de 5000px de ancho.
                     let targetWidth = containerWidth - 30;
                     if (targetWidth > 900) targetWidth = 900; 
 
-                    currentScale = targetWidth / unscaledViewport.width; 
-                    if (currentScale < 0.5) currentScale = 0.5;
+                    initialScale = targetWidth / unscaledViewport.width; 
+                    if (initialScale < 0.5) initialScale = 0.5;
                 }
                 
-                // Viewport CSS (Tamaño visual normal en pantalla)
-                const cssViewport = page.getViewport({scale: currentScale});
+                // La escala actual se calcula multiplicando el Initial(100%) por el Porcentaje del Panel
+                let appliedScale = initialScale * (currentZoomPercent / 100);
                 
-                // Viewport HD (Resolución interna gigantesca y 100% nítida)
-                const renderViewport = page.getViewport({scale: currentScale * hdRatio});
+                const cssViewport = page.getViewport({scale: appliedScale});
+                const renderViewport = page.getViewport({scale: appliedScale * hdRatio});
                 
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 
-                // Tamaño físico (Super Resolución)
                 canvas.width = Math.floor(renderViewport.width);
                 canvas.height = Math.floor(renderViewport.height);
-                
-                // Tamaño visual CSS (Tamaño Ajustado)
                 canvas.style.width = Math.floor(cssViewport.width) + "px";
                 canvas.style.height = Math.floor(cssViewport.height) + "px";
                 
                 scoreBody.appendChild(canvas);
                 
-                const renderContext = {
-                    canvasContext: ctx,
-                    viewport: renderViewport // El motor dibuja a lo grande y se comprime en CSS
-                };
-                
-                // Usamos "await" (Promesa) para que dibuje de 1 en 1 sin congelar la ventana
+                const renderContext = { canvasContext: ctx, viewport: renderViewport };
                 await page.render(renderContext).promise;
             }
         }
@@ -1197,6 +1258,9 @@
             event.stopPropagation();
             scoreBody.innerHTML = '';
             
+            // Sincronizar el icono del visor con el audio general si ya está sonando
+            if(scorePlayIcon) scorePlayIcon.innerHTML = isPlaying ? iconPause : iconPlay;
+
             const isPdf = url.toLowerCase().includes('.pdf');
             
             let finalUrl = url;
@@ -1205,30 +1269,22 @@
                 finalUrl = finalUrl.replace("www.dropbox.com", "dl.dropboxusercontent.com");
             }
             
+            // Reiniciar Valores para el Zoom Nuevo Documento
+            currentZoomPercent = 100;
+            initialScale = null;
+            pdfDoc = null;
+            szDisplay.innerText = `100%`;
+            scoreZoomPanel.classList.remove('show');
+
             if (isPdf && pdfjsLib) {
-                // Mostrar controles de Zoom
-                scoreZoomIn.style.display = 'flex';
-                scoreZoomOut.style.display = 'flex';
-                
-                // Reiniciar estado
-                currentScale = null; 
-                pdfDoc = null;
-                
-                // Extraer y Renderizar con motor vectorial
                 pdfjsLib.getDocument(finalUrl).promise.then(function(pdfDoc_) {
                     pdfDoc = pdfDoc_;
                     renderAllPages();
                 }).catch(function(error) {
-                    console.error("Error cargando PDF:", error);
                     scoreBody.innerHTML = '<p style="color:#fff; padding:20px; text-align:center;">Error al cargar el PDF. Verifica tu conexión a internet.</p>';
                 });
-                
             } else {
-                // Modo Imagen 
-                scoreZoomIn.style.display = 'flex';
-                scoreZoomOut.style.display = 'flex';
-                currentImgWidth = 100;
-                scoreBody.innerHTML = `<img id="scoreImage" src="${finalUrl}" oncontextmenu="return false;" />`;
+                scoreBody.innerHTML = `<img id="scoreImage" src="${finalUrl}" style="width: 100%;" oncontextmenu="return false;" />`;
             }
             
             scoreModal.classList.add('show');
@@ -1236,33 +1292,18 @@
 
         closeScoreModal.addEventListener('click', () => {
             scoreModal.classList.remove('show');
+            scoreZoomPanel.classList.remove('show');
             scoreBody.innerHTML = ''; 
             pdfDoc = null; 
         });
 
-        // Controles de ZOOM
-        scoreZoomIn.addEventListener('click', () => {
-            const img = document.getElementById('scoreImage');
-            if (img) {
-                currentImgWidth += 20;
-                img.style.width = `${currentImgWidth}%`;
-                img.style.maxWidth = 'none'; 
-            } else if (pdfDoc) {
-                currentScale += 0.25;
-                renderAllPages(); 
-            }
+        // Controles de Play/Pausa Inyectados en el Visor
+        document.getElementById('scorePlayPauseBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (activeAudio.paused || !isPlaying) playSong();
+            else pauseSong();
         });
 
-        scoreZoomOut.addEventListener('click', () => {
-            const img = document.getElementById('scoreImage');
-            if (img && currentImgWidth > 40) {
-                currentImgWidth -= 20;
-                img.style.width = `${currentImgWidth}%`;
-            } else if (pdfDoc && currentScale > 0.5) {
-                currentScale -= 0.25;
-                renderAllPages(); 
-            }
-        });
 
         window.openRefModal = function(event, index) {
             event.stopPropagation();
@@ -1502,9 +1543,16 @@
             try { navigator.mediaSession.playbackState = state; } catch (error) {}
         }
 
+        // --- ACTUALIZACIÓN DE ICONOS SINCRONIZADA ---
         function updatePlayButton(playing) {
             isPlaying = playing;
             playIcon.innerHTML = playing ? iconPause : iconPlay;
+            
+            // Si el visor está abierto, el botón ahí también cambia
+            if (scorePlayIcon) {
+                scorePlayIcon.innerHTML = playing ? iconPause : iconPlay;
+            }
+
             coverEl.style.animationPlayState = playing ? 'running' : 'paused';
         }
 
@@ -1529,9 +1577,8 @@
             isPlaying = true;
             intentionalPause = false;
             backgroundPlaybackExpected = true;
-            playIcon.innerHTML = iconPause;
+            updatePlayButton(true);
             setMediaPlaybackState("playing");
-            coverEl.style.animationPlayState = "running";
             requestAudioPlay(activeAudio);
         }
 
@@ -1539,10 +1586,9 @@
             isPlaying = false;
             intentionalPause = true;
             backgroundPlaybackExpected = false;
-            playIcon.innerHTML = iconPlay;
+            updatePlayButton(false);
             try { activeAudio.pause(); } catch (e) {}
             setMediaPlaybackState("paused");
-            coverEl.style.animationPlayState = "paused";
         }
 
         function seekBy(seconds) {
@@ -1554,9 +1600,7 @@
             if (!backgroundPlaybackExpected || intentionalPause || !isPlaying) return;
             if (!activeAudio || activeAudio.ended) return;
             if (activeAudio.paused) requestAudioPlay(activeAudio);
-
-            playIcon.innerHTML = iconPause;
-            coverEl.style.animationPlayState = "running";
+            updatePlayButton(true);
             setMediaPlaybackState("playing");
         }
 
