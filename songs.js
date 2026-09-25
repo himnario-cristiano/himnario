@@ -65,7 +65,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/t87zebx2o2ndo3p7ra2v1/Cuando-Los-Santos-Marchen-Ya.pdf?rlkey=ffylr1mrs3ox4j2bdpmtu91oh&st=kghxi6t8&dl=0",
                 src: "https://www.dropbox.com/scl/fi/5zwq2jzitf5g4g0o59z6h/006.-Cuando-Los-Santos-Marchen-Ya.wav?rlkey=f6abclfxujuq6leuauptthcx5&st=kzl4cb3t&dl=0",
                 references: [
 					
@@ -87,7 +87,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/96641xx1cffknhc86ww1g/05-Oh-Bondad-Tan-Infinita-Figuras.pdf?rlkey=sq3587e35c8omvzghvbo9tep0&st=7a0nys0d&dl=0",
                 src: "https://www.dropbox.com/scl/fi/e1er7zvaxnk99avgqjyi2/008.-Oh-Bondad-Tan-Infinita.mp3?rlkey=nk3mbq62ro8nuqf0w3ggb5pmx&st=1xmrvhll&dl=0",
                 references: [
 					
@@ -98,7 +98,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/spkpvt8vxa3ikokdo5os5/06-Bellas-Palabras-de-Vida-Figuras.pdf?rlkey=2lxlbbea60nyk82itr7dp5ms7&st=fmqczo24&dl=0",
                 src: "https://www.dropbox.com/scl/fi/w66qhrx3maany6jcbbdf0/009.-Bellas-Palabras-De-Vida.mp3?rlkey=u1thjoett4f035pdth5qeo9sh&st=wldkzogg&dl=0",
                 references: [
 
@@ -110,7 +110,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/btvl0tt2b4wuq6q50q9xl/08-Gloria-A-La-Trinidad-Figuras.pdf?rlkey=w4obs3qhri5dep4zsk32dehih&st=dyiz0coa&dl=0",
                 src: "https://www.dropbox.com/scl/fi/oc07c90u9d57ca6nq2xep/010.-Gloria-A-La-Trinidad.mp3?rlkey=nteed9320ll7warkewg844bsg&st=k5ebuvx4&dl=0",
                 references: [
 					
@@ -121,7 +121,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/f32a6cx49l5smcjrcidep/09-Lugar-Para-Cristo-Figuras.pdf?rlkey=40wj9o3wmawqazawno9z2pjtt&st=d59qj2gp&dl=0",
                 src: "https://www.dropbox.com/scl/fi/nkjpkjfz54121an6ugyn7/011.-Lugar-Para-Cristo.mp3?rlkey=i0yi1q9fvzkytevllntbkxkqq&st=p7mxgew9&dl=0",
                 references: [
 					
@@ -132,7 +132,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/g543sj8few9k9bkqpo9p4/11-Hay-Un-Lugar-Do-Quiero-Estar-Figura.pdf?rlkey=dgkwb9rsk0ovqkisvnerammgd&st=gjzt68sx&dl=0",
                 src: "https://www.dropbox.com/scl/fi/diqw123ob42k0ft4ekima/012.-Hay-Un-Lugar-Do-Quiero-Estar.mp3?rlkey=t5fgy3x996y3q4jut2a1j2a4b&st=el72e6qy&dl=0",
                 references: [
 
@@ -144,7 +144,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/zzm3spuhfrp1c4eojjk1g/12-Roca-De-La-Eternidad-Figuras.pdf?rlkey=5nzzomp2k2rf88fztalpjs23l&st=t13vaah4&dl=0",
                 src: "https://www.dropbox.com/scl/fi/5yzmbvc44uvq9jfkh8y3m/013.-Roca-De-La-Eternidad.mp3?rlkey=3m8xge8pj2oaggdtvtotbbgrq&st=84sg8m44&dl=0",
                 references: [
 					
@@ -155,7 +155,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/1dkxeqm76h1rkl7aim3ml/13-Dulce-Oracion-figuras.pdf?rlkey=wwxhxzxci1dicycf7ezf0b4zg&st=sg3z76tu&dl=0",
                 src: "https://www.dropbox.com/scl/fi/5dn75rzwwvdtt1iccbxdn/014.-Dulce-Oraci-n.mp3?rlkey=rc9s8ljk5u1r4z2dakjy4jck1&st=wffx5tq1&dl=0",
                 references: [
 					
@@ -166,7 +166,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/m7c96ukw995du0hgw0ln1/14-Oh-Que-Amigo-Figuras.pdf?rlkey=b2ibhyaof5z9mq1v1hrux1mx7&st=9wiejlyo&dl=0",
                 src: "https://www.dropbox.com/scl/fi/lqx5cf5tel70rpq07w80q/015.-Oh-Que-Amigo-Nos-Es-Cristo.mp3?rlkey=6axkv0pf51pbjtnx2th9qbe7c&st=rkq32i4m&dl=0",
                 references: [
 
@@ -178,7 +178,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/uilijcdgm2dxwpagw4rsr/16-Cerca-de-Ti-Se-or-Figuras.pdf?rlkey=xzu5ln7qqn6k00db22wpvmfnz&st=c61k1xs9&dl=0",
                 src: "https://www.dropbox.com/scl/fi/vwbz862pczjch6zb1e2dk/016.-Cerca-De-Ti-Se-or.mp3?rlkey=frlcjm60j5rr4sg0w8cbcpfes&st=f1xa1d2t&dl=0",
                 references: [
 					
@@ -189,7 +189,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/ex9vkvhtn308s55qdjql4/18-Grato-Es-Decir-La-Historia-Figuras.pdf?rlkey=5z8ziah8j2sz9g9rhkzmvx4ww&st=5dcobaab&dl=0",
                 src: "https://www.dropbox.com/scl/fi/5wcuayze7j7vgytu9rwtv/017.-Grato-Es-Decir-La-Historia.mp3?rlkey=ks9gbrlf1n9mri0vr9lpnpukb&st=tkbtadvp&dl=0",
                 references: [
 					
@@ -200,7 +200,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/qtlu5vv4pefp2ldyrw8ln/22-Fuente-De-La-Vida-Eterna-Figuras.pdf?rlkey=hdueayl2q6242w1bmf4fe6404&st=zqafndlz&dl=0",
                 src: "https://www.dropbox.com/scl/fi/rt4v2yz2t1970pm7yz2gs/018.-Fuente-De-La-Vida-Eterna.mp3?rlkey=zn5by4g1tlva6nzl8dbxbj1du&st=21jklzts&dl=0",
                 references: [
 					
@@ -211,7 +211,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/3r1l1r0j65pub5inqcm8w/25-Meditad-Figuras.pdf?rlkey=yv1hd96ne2ofwogolxr5eyblp&st=9z3fvdgi&dl=0",
                 src: "https://www.dropbox.com/scl/fi/ng21eg45x98esk9o0v5w7/019.-Meditad.mp3?rlkey=0q83jp9pfae4tqp0jt9tjuy1w&st=baqp1blm&dl=0",
                 references: [
 					
@@ -222,7 +222,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/hdw78n7qs49ujonx7b0vv/27-Padre-Tu-Palabra-Es-Figuras.pdf?rlkey=ac0jq7sprg549mxdljx4l8x6h&st=f50w2vqz&dl=0",
                 src: "https://www.dropbox.com/scl/fi/7soybk8f0hikcht5291b8/020.-Padre-Tu-Palabra.mp3?rlkey=dc5se0gs71ptrwzlwy5b4djsn&st=geyzcc3l&dl=0",
                 references: [
 					
@@ -233,7 +233,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/wsma0hpr298j98b1xgu7s/28-Pronto-La-Noche-Viene-Figuras.pdf?rlkey=y1ikzpw9tucry35zibca5ivlv&st=lv3n7ix3&dl=0",
                 src: "https://www.dropbox.com/scl/fi/8zp9766qfxe7o7xl6p3cq/021.-Pronto-La-Noche-Viene.mp3?rlkey=7ra4dsmbkr88w8bp2qncseycc&st=yj1mi0cp&dl=0",
                 references: [
 					
@@ -244,7 +244,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/b04j9q2f0ood269cnbcnp/30-La-Santa-Cena-Figuras.pdf?rlkey=tpn9hrpz4dkcib3uycpl0gcem&st=qtb17xty&dl=0",
                 src: "https://www.dropbox.com/scl/fi/81sm6a3mzxo23kvobl4jn/022.-La-Santa-Cena.mp3?rlkey=saxprfjnl2bl2sesibvaawye0&st=y757e7ru&dl=0",
                 references: [
 					
@@ -255,7 +255,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/mkcknn01apy0ujuttbrci/33-Salvador-A-Ti-Me-Rindo-Figuras.pdf?rlkey=sfxm533dali02jsgfubvwgo67&st=q4kubq04&dl=0",
                 src: "https://www.dropbox.com/scl/fi/g25lvtjhl8cbgkve18cf5/023.-A-T-Me-Rindo.mp3?rlkey=okhs17wxbyrzvljwmhpxwlhb9&st=ybykddyp&dl=0",
                 references: [
 					
