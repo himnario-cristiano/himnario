@@ -32,13 +32,21 @@
         body { 
             background-color: #121212; 
             width: 100vw; 
+            
+            /* 1. Mantiene 100vh como respaldo para navegadores muy antiguos */
             height: 100vh; 
+            
+            /* 2. Solución principal: Altura dinámica que se adapta si aparecen/desaparecen barras */
+            height: 100dvh; 
+            
+            /* 3. (Opcional pero recomendado) Evita que la barra de gestos inferior tape el contenido */
+            padding-bottom: env(safe-area-inset-bottom);
+            
             overflow: hidden; 
             display: flex; 
             justify-content: center; 
             align-items: center;
         }
-
         .player-container { 
             width: 100%; 
             height: 100%; 
