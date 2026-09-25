@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HIMNARIO CRISTIANO</title>
 
+    <!-- Favicon -->
+    <link rel="icon" href="https://i.postimg.cc/14xJ49F9/LOGO-Himnario-Cristiano.png" type="image/png">
+
     <!-- Etiquetas PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#121212">
@@ -33,13 +36,13 @@
             background-color: #121212; 
             width: 100vw; 
             
-            /* 1. Mantiene 100vh como respaldo para navegadores muy antiguos */
+            /* Mantiene 100vh como respaldo para navegadores muy antiguos */
             height: 100vh; 
             
-            /* 2. Solución principal: Altura dinámica que se adapta si aparecen/desaparecen barras */
+            /* Solución principal: Altura dinámica que se adapta si aparecen/desaparecen barras */
             height: 100dvh; 
             
-            /* 3. (Opcional pero recomendado) Evita que la barra de gestos inferior tape el contenido */
+            /* Evita que la barra de gestos inferior tape el contenido */
             padding-bottom: env(safe-area-inset-bottom);
             
             overflow: hidden; 
@@ -47,6 +50,7 @@
             justify-content: center; 
             align-items: center;
         }
+
         .player-container { 
             width: 100%; 
             height: 100%; 
@@ -688,16 +692,15 @@
         }
         .score-zoom-panel.show { display: flex; }
         
-        /* Contenedor scrolleable - REVISADO PARA EVITAR CORTE A LA IZQUIERDA Y MEJORAR EN MÓVILES */
+        /* Contenedor scrolleable */
         .score-body {
             flex: 1;
             overflow: auto; 
             background: #121212;
-            -webkit-overflow-scrolling: touch; /* Suaviza el scroll en iOS */
+            -webkit-overflow-scrolling: touch;
         }
         
-        /* Envoltorio (Wrapper) estilo 'table' que fuerza a que el contenido se centre SI cabe,
-           pero lo empuja desde la izquierda SI es más ancho (16:9), evitando que se corte el borde izquierdo */
+        /* Envoltorio (Wrapper) estilo 'table' */
         .canvas-wrapper {
             display: table;
             margin: 0 auto;
@@ -706,9 +709,9 @@
         
         .score-body canvas {
             display: block;
-            margin-bottom: 15px; 
+            margin-bottom: 6px; /* Espacio reducido entre hojas */
             background: #fff;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             max-width: none; 
         }
         
@@ -1027,6 +1030,10 @@
     <!-- Modal para ver partituras e imágenes en pantalla completa -->
     <div class="score-modal" id="scoreModal">
         <div class="score-header">
+            
+            <!-- Indicador de Página (Nuevo) -->
+            <div id="scorePageIndicator" style="color: #b3b3b3; font-size: 14px; margin-right: auto; font-weight: 600; display: none;"></div>
+            
             <!-- Botón del Audio en PDF -->
             <button id="scorePlayPauseBtn" class="ctrl-btn" title="Reproducir/Pausar Himno">
                 <svg viewBox="0 0 24 24" id="scorePlayIcon"><path d="M8 5v14l11-7z"/></svg>
@@ -1065,6 +1072,9 @@
         let backgroundPlaybackExpected = false;
         let backgroundRecoveryTimer = null;
 
+        // INICIA EN TRUE PARA EVITAR AUTO-REPRODUCCIÓN BUGGEADA
+        let intentionalPause = true; 
+
         function initializeGlobalPermissions() {
             if (isGlobalAudioUnlocked) return;
 
@@ -1076,7 +1086,10 @@
                 try {
                     const promise = audio.play();
                     if (promise && typeof promise.then === "function") {
-                        promise.then(() => audio.pause()).catch(() => {});
+                        promise.then(() => {
+                            // Fuerza pausa si no había intención explícita de reproducir
+                            if (intentionalPause) audio.pause();
+                        }).catch(() => {});
                     }
                 } catch (e) {}
             };
@@ -1096,7 +1109,6 @@
         let isPlaying = false;
         let showOnlyFavorites = false; 
         let playbackMode = 0; 
-        let intentionalPause = false;
         let isBuffering = false;
 
         const playlistEl = document.getElementById("playlistItems");
@@ -1186,7 +1198,7 @@
         const closeScoreModal = document.getElementById('closeScoreModal');
         
         /* ----------------------------------------------------
-           LÓGICA NATIVA DE PDF.JS (VECTORIAL) + ZOOM PANEL
+           LÓGICA NATIVA DE PDF.JS (VECTORIAL) + ZOOM PANEL + PAGE INDICATOR
            ---------------------------------------------------- */
         const pdfjsLib = window['pdfjs-dist/build/pdf'];
         if (pdfjsLib) {
@@ -1197,6 +1209,20 @@
         let initialScale = null;
         let currentZoomPercent = 100; 
         let currentScoreIndex = null; 
+        
+        // Variables para indicador de página
+        let currentPageNum = 1;
+        let totalPagesNum = 1;
+        const scorePageIndicator = document.getElementById('scorePageIndicator');
+
+        function updatePageIndicator() {
+            if (pdfDoc) {
+                scorePageIndicator.style.display = 'block';
+                scorePageIndicator.innerText = `${currentPageNum} / ${totalPagesNum}`;
+            } else {
+                scorePageIndicator.style.display = 'none';
+            }
+        }
         
         const scoreZoomToggle = document.getElementById('scoreZoomToggle');
         const scoreZoomPanel = document.getElementById('scoreZoomPanel');
@@ -1234,15 +1260,13 @@
         
         async function renderAllPages() {
             if (!pdfDoc) return;
+            const previousPage = currentPageNum; // Guardar página actual antes de repintar
             scoreBody.innerHTML = ''; 
             
-            // Limitamos la densidad de píxeles en móviles para evitar que el navegador se quede sin memoria RAM
-            // y "saltee" (deje en blanco) las páginas al hacer renderizado de múltiples lienzos pesados.
             const isMobile = window.innerWidth <= 768;
             const deviceRatio = window.devicePixelRatio || 1;
             const hdRatio = isMobile ? 1.2 : Math.max(deviceRatio, 2); 
             
-            // Creamos el contenedor "table" para que los canvas no recorten el lado izquierdo en PDFs 16:9
             const wrapper = document.createElement('div');
             wrapper.className = 'canvas-wrapper';
             scoreBody.appendChild(wrapper);
@@ -1273,13 +1297,46 @@
                 canvas.height = Math.floor(renderViewport.height);
                 canvas.style.width = Math.floor(cssViewport.width) + "px";
                 canvas.style.height = Math.floor(cssViewport.height) + "px";
+                canvas.setAttribute('data-page-num', num);
                 
                 wrapper.appendChild(canvas);
+                
+                // Si la página a añadir es en la que estábamos antes de hacer zoom, mantenemos la vista anclada ahí
+                if (num === previousPage) {
+                    canvas.scrollIntoView({ behavior: 'instant', block: 'start' });
+                }
                 
                 const renderContext = { canvasContext: ctx, viewport: renderViewport };
                 await page.render(renderContext).promise;
             }
         }
+        
+        // Listener para actualizar el número de página al hacer scroll en el visor
+        scoreBody.addEventListener('scroll', () => {
+            if (!pdfDoc) return;
+            const canvases = scoreBody.querySelectorAll('canvas');
+            let foundPage = currentPageNum;
+            let minDistance = Infinity;
+            
+            // Calculamos el centro vertical del contenedor
+            const containerCenter = scoreBody.getBoundingClientRect().top + (scoreBody.clientHeight / 2);
+            
+            canvases.forEach((canvas) => {
+                const rect = canvas.getBoundingClientRect();
+                const canvasCenter = rect.top + (rect.height / 2);
+                const dist = Math.abs(containerCenter - canvasCenter);
+                
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    foundPage = parseInt(canvas.getAttribute('data-page-num')) || 1;
+                }
+            });
+            
+            if (foundPage !== currentPageNum) {
+                currentPageNum = foundPage;
+                updatePageIndicator();
+            }
+        });
 
         window.openScore = function(event, index) {
             event.stopPropagation();
@@ -1308,16 +1365,23 @@
             pdfDoc = null;
             szDisplay.innerText = `100%`;
             scoreZoomPanel.classList.remove('show');
+            
+            currentPageNum = 1;
+            totalPagesNum = 1;
+            updatePageIndicator();
 
             if (isPdf && pdfjsLib) {
                 pdfjsLib.getDocument(finalUrl).promise.then(function(pdfDoc_) {
                     pdfDoc = pdfDoc_;
+                    totalPagesNum = pdfDoc.numPages;
+                    updatePageIndicator();
                     renderAllPages();
                 }).catch(function(error) {
                     scoreBody.innerHTML = '<p style="color:#fff; padding:20px; text-align:center;">Error al cargar el PDF. Verifica tu conexión a internet.</p>';
                 });
             } else {
                 scoreBody.innerHTML = `<div class="canvas-wrapper"><img id="scoreImage" src="${finalUrl}" style="width: 100%;" oncontextmenu="return false;" /></div>`;
+                scorePageIndicator.style.display = 'none';
             }
             
             scoreModal.classList.add('show');
@@ -1328,6 +1392,7 @@
             scoreZoomPanel.classList.remove('show');
             scoreBody.innerHTML = ''; 
             pdfDoc = null; 
+            scorePageIndicator.style.display = 'none';
         });
 
         // Controles de Play/Pausa Inyectados en el Visor
@@ -1522,7 +1587,7 @@
         window.selectSong = function(index) {
             if (!songs[index]) return;
             songIndex = index;
-            intentionalPause = false;
+            intentionalPause = false; // El usuario selecciona, significa que quiere reproducir
             
             const song = songs[songIndex];
             titleEl.innerText = song.title || 'Sin título';
@@ -1715,6 +1780,7 @@
             let prevIndex = currentIdxInFiltered === -1 ? filtered[0] : filtered[(currentIdxInFiltered - 1 + filtered.length) % filtered.length];
 
             songIndex = prevIndex;
+            intentionalPause = false;
             const song = songs[songIndex];
 
             titleEl.innerText = song.title || 'Sin título';
