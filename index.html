@@ -6,7 +6,7 @@
     <title>HIMNARIO CRISTIANO</title>
 
     <!-- Favicon -->
-    <link rel="icon" href="Himnario-Cristiano.png" type="image/png">
+    <link rel="icon" href="https://i.postimg.cc/14xJ49F9/LOGO-Himnario-Cristiano.png" type="image/png">
 
     <!-- Etiquetas PWA -->
     <link rel="manifest" href="manifest.json">
@@ -1072,29 +1072,15 @@
         let backgroundPlaybackExpected = false;
         let backgroundRecoveryTimer = null;
 
-        // INICIA EN TRUE PARA EVITAR AUTO-REPRODUCCIÓN BUGGEADA
         let intentionalPause = true; 
 
+        // Eliminamos la lógica de audio.play() forzado que causaba el bug.
+        // Solo mantenemos la petición de notificaciones sutil por si se necesita más adelante.
         function initializeGlobalPermissions() {
             if (isGlobalAudioUnlocked) return;
-
             if ("Notification" in window && Notification.permission === "default") {
                 Notification.requestPermission().catch(() => {});
             }
-
-            const unlockAudio = (audio) => {
-                try {
-                    const promise = audio.play();
-                    if (promise && typeof promise.then === "function") {
-                        promise.then(() => {
-                            // Fuerza pausa si no había intención explícita de reproducir
-                            if (intentionalPause) audio.pause();
-                        }).catch(() => {});
-                    }
-                } catch (e) {}
-            };
-
-            unlockAudio(activeAudio);
             isGlobalAudioUnlocked = true;
             document.removeEventListener('click', initializeGlobalPermissions);
             document.removeEventListener('touchstart', initializeGlobalPermissions);
@@ -1258,35 +1244,42 @@
         szDecrease.addEventListener('click', () => { if (currentZoomPercent > 25) { currentZoomPercent -= 25; updateScoreZoomDisplay(); } });
         szReset.addEventListener('click', () => { currentZoomPercent = 100; updateScoreZoomDisplay(); });
         
+        // Función mejorada: Crea el DOM estático antes de pintar para no perder el Scroll
         async function renderAllPages() {
             if (!pdfDoc) return;
-            const previousPage = currentPageNum; // Guardar página actual antes de repintar
+            const previousPage = currentPageNum; 
+            
             scoreBody.innerHTML = ''; 
-            
-            const isMobile = window.innerWidth <= 768;
-            const deviceRatio = window.devicePixelRatio || 1;
-            const hdRatio = isMobile ? 1.2 : Math.max(deviceRatio, 2); 
-            
             const wrapper = document.createElement('div');
             wrapper.className = 'canvas-wrapper';
             scoreBody.appendChild(wrapper);
 
+            const isMobile = window.innerWidth <= 768;
+            const deviceRatio = window.devicePixelRatio || 1;
+            const hdRatio = isMobile ? 1.2 : Math.max(deviceRatio, 2); 
+
+            // 1. Obtener todas las páginas en paralelo
+            const pagePromises = [];
             for (let num = 1; num <= pdfDoc.numPages; num++) {
-                const page = await pdfDoc.getPage(num);
+                pagePromises.push(pdfDoc.getPage(num));
+            }
+            const pages = await Promise.all(pagePromises);
+
+            // 2. Crear todos los canvas síncronamente en el DOM para fijar la altura total
+            const canvasesData = [];
+            for (let num = 1; num <= pages.length; num++) {
+                const page = pages[num - 1];
                 
                 if (num === 1 && !initialScale) {
                     const containerWidth = scoreBody.clientWidth;
                     const unscaledViewport = page.getViewport({scale: 1});
-                    
                     let targetWidth = containerWidth - 40; 
                     if (targetWidth > 1200) targetWidth = 1200; 
-
                     initialScale = targetWidth / unscaledViewport.width; 
                     if (initialScale < 0.2) initialScale = 0.2;
                 }
                 
                 let appliedScale = initialScale * (currentZoomPercent / 100);
-                
                 const cssViewport = page.getViewport({scale: appliedScale});
                 const renderViewport = page.getViewport({scale: appliedScale * hdRatio});
                 
@@ -1300,12 +1293,17 @@
                 canvas.setAttribute('data-page-num', num);
                 
                 wrapper.appendChild(canvas);
-                
-                // Si la página a añadir es en la que estábamos antes de hacer zoom, mantenemos la vista anclada ahí
-                if (num === previousPage) {
-                    canvas.scrollIntoView({ behavior: 'instant', block: 'start' });
-                }
-                
+                canvasesData.push({ canvas, ctx, renderViewport, page });
+            }
+
+            // 3. Ya con los canvas en el DOM, hacer scroll a la página en la que estábamos
+            if (previousPage > 0 && previousPage <= canvasesData.length) {
+                canvasesData[previousPage - 1].canvas.scrollIntoView({ behavior: 'instant', block: 'start' });
+            }
+
+            // 4. Renderizar píxeles de cada página de manera segura
+            for (let i = 0; i < canvasesData.length; i++) {
+                const { canvas, ctx, renderViewport, page } = canvasesData[i];
                 const renderContext = { canvasContext: ctx, viewport: renderViewport };
                 await page.render(renderContext).promise;
             }
@@ -1587,7 +1585,7 @@
         window.selectSong = function(index) {
             if (!songs[index]) return;
             songIndex = index;
-            intentionalPause = false; // El usuario selecciona, significa que quiere reproducir
+            intentionalPause = false; 
             
             const song = songs[songIndex];
             titleEl.innerText = song.title || 'Sin título';
