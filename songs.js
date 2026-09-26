@@ -1322,7 +1322,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/nj19mvmmfn47dy078cvoo/239-Todav-a-Se-or-16_9.pdf?rlkey=gs95n28jtqj4lg0a57tkypdkw&st=1fp0bi0n&dl=0",
                 src: "https://www.dropbox.com/scl/fi/72dy997w4hqbs6v4utcr8/111.-Todavia-Se-or.mp3?rlkey=7nhujlyh4cdpnq1uodzrl6dbt&st=w6wyx22e&dl=0",
                 references: [
 
@@ -1334,7 +1334,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/hdb1kpdryo81r2kg7zoej/tenme-brillando-se-or-HG.pdf?rlkey=1njf6xz192ijo2257cfv6jxjk&st=h4uroljq&dl=0",
                 src: "https://www.dropbox.com/scl/fi/rc0nw5rfcyn6q5eoclthl/112.-Tenme-brillando-Se-or.mp3?rlkey=kdgzmqkg7armlyp6f82ej6n3h&st=kw1pemxg&dl=0",
                 references: [
 
@@ -1346,7 +1346,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/tmadpp7ol09w7fv7pjlbp/113.-Jesucristo-Se-or-M-o.pdf?rlkey=yblnh79obocl2waduf0u8cf4h&st=0c7z9ni5&dl=0",
                 src: "https://www.dropbox.com/scl/fi/8gol8t5o1afdpikj5ms5j/113.-Mi-Se-or-Es-Jesucristo.mp3?rlkey=avylpv5byqybz55xbx8rl9bkx&st=lej80brq&dl=0",
                 references: [
 
@@ -1358,7 +1358,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/vxtykoxkkojhhjargwuiw/085b-Canta-Alabanzas-Al-Se-or-Final.pdf?rlkey=4twnskbpgibgcataizk68n2s7&st=h2igvx4r&dl=0",
                 src: "https://www.dropbox.com/scl/fi/yyvrfutaqne3ssmelnkjg/114.-Canta-Alabanzas-Al-Se-or.mp3?rlkey=2v7li38ct43wz7dpgxzx19ruv&st=2s9td0qk&dl=0",
                 references: [
 
@@ -1370,7 +1370,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/wzxs9warclri1rnpnzmrk/115.-Solo-Dios-Hace-Al-Hombre-Feliz.pdf?rlkey=xx8z5h2ts0xqz6sseifhx7nhh&st=x81txrrp&dl=0",
                 src: "https://www.dropbox.com/scl/fi/0escqsfg731zyxx4shlvg/115.-Solo-Dios-Hace-Al-Hombre-Feliz.mp3?rlkey=i7oxy1nrhsdx1zi05z4hcwtic&st=isb51mdr&dl=0",
                 references: [
 
@@ -1378,11 +1378,11 @@
                 ] // {hymnal: "himnario ...", number: "00"} Array vacío si no hay referencias
             },
             {
-                title: "116 - Alabré, Alabaré",
+                title: "116 - Alabaré, Alabaré",
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/e6o6czs4dn8h7f3j8bk9v/87-Alabar-16_9.pdf?rlkey=watmp7o92udrounhb5q375w1l&st=qg1rttsx&dl=0",
                 src: "https://www.dropbox.com/scl/fi/0shty4dmuab5atmngb8sl/116.-Alabr-Alabar.mp3?rlkey=rbe4ch7rmgt4c9evxpvh0p73z&st=xuheb5zm&dl=0",
                 references: [
 
@@ -1394,7 +1394,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/ayy9a4mfqel8eblsirj7u/166-Este-es-el-D-a-16_9.pdf?rlkey=f79guhdqkpvpvoumdsqj3h5dq&st=81weh0jc&dl=0",
                 src: "https://www.dropbox.com/scl/fi/1hzt4l9drru8zgsavd4t9/117.-Este-Es-El-D-a.mp3?rlkey=4iq7i8las0f6x46m3z6x9jup8&st=c6t73gwt&dl=0",
                 references: [
 
@@ -1406,7 +1406,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/0rp9zpbdzqtxot462vls5/118.-Yo-Se-Que-Cristo-Siempre-Me-Ayudar.pdf?rlkey=edusps55rz6sqiqrl9iexi54k&st=ecd0zvtn&dl=0",
                 src: "https://www.dropbox.com/scl/fi/80d6w4oakfwmc7x4o22pe/118.-Yo-Se-Que-Cristo-Siempre-Me-Ayudara.mp3?rlkey=d7633slaurrxku5tv944u7weg&st=a6qewkih&dl=0",
                 references: [
 
@@ -1418,7 +1418,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/7tq6psn77hncpz66st4t9/200-No-Hay-Dios-Tan-Grande-Como-T-Figuras.pdf?rlkey=5x5ju5gfhfwp2tdbzaod4nn86&st=cqvmb303&dl=0",
                 src: "https://www.dropbox.com/scl/fi/40snqtw0nte97231vb0p7/119.-No-Hay-Dios-Tan-Grande-Como-Tu.mp3?rlkey=3zvjy485i4syzgc3g01naimom&st=2mzsdgsh&dl=0",
                 references: [
 
@@ -1430,7 +1430,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/5anaqqsgwwp8si7861nsg/120-Amar-Amar-Amar-letra.pdf?rlkey=vnehke1s104n08jl42ve6pnvt&st=67tg6ash&dl=0",
                 src: "https://www.dropbox.com/scl/fi/yxiznhujq4vuukhnze4u5/120.-Amar-Amar-Amar.mp3?rlkey=ecf1twb4a7cuhhdinu55gh9th&st=pk6jykkm&dl=0",
                 references: [
 
@@ -1442,7 +1442,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/n01yfgzgzrd311tj2a0tm/121-Cantad-A-Jehov-letra.pdf?rlkey=3iejqj649pb5r8n2b0o4n71aj&st=p2rorzaw&dl=0",
                 src: "https://www.dropbox.com/scl/fi/ez4rlri8mg2wa011e15vg/121.-Cantad-A-Jehov.mp3?rlkey=2j5dkfcwoamevxwqagnjob53j&st=v096rx9r&dl=0",
                 references: [
 
@@ -1454,7 +1454,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/bus9xwgj8utaquuxm79k4/122-Regocijaos-En-El-Se-or-letra.pdf?rlkey=s1weebwidmoa53cd9kbqn9tc3&st=oy0mzxxm&dl=0",
                 src: "https://www.dropbox.com/scl/fi/xdzxaqr8z1x8f4n4sns40/122.Regocijaos-En-El-Se-or-Siempre.mp3?rlkey=lz8vdwbqbnhk3m3paegaadalq&st=gii2engl&dl=0",
                 references: [
 
@@ -1466,7 +1466,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/r07jznhrn3g24qgu2h6wd/He-Decidido-Seguir-A-Cristo-5-Estrofas.pdf?rlkey=7o2iri19jpea9zm6yujw4yt1v&st=wphk082e&dl=0",
                 src: "https://www.dropbox.com/scl/fi/zwstwgn0kexwioqpipoul/123.-He-Decidido-Seguir-A-Cristo.mp3?rlkey=u9chve8c8znow5s3dzt8ubxv4&st=cy89p7cm&dl=0",
                 references: [
 
@@ -1478,7 +1478,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/ehrka0y1ap2wnfgplllg9/193-Unidos-16_9.pdf?rlkey=hyhf8dt9b4sg755arvve0bvlo&st=d0lwgnic&dl=0",
                 src: "https://www.dropbox.com/scl/fi/7ub0hdgyply8o90q2vmly/124.-Unidos-Unidos-En-Su-Nombre-Unidos.mp3?rlkey=gm5ndb01k2j1avar2ec36qyxs&st=7jjqz7t7&dl=0",
                 references: [
 
@@ -1490,7 +1490,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/m5g1oz8kix2fsg99zhc9v/A-Dios-Demos-Gloria-full-HG.pdf?rlkey=4fpmk71qhllsq98ysugmyv39r&st=3wmuswjx&dl=0",
                 src: "https://www.dropbox.com/scl/fi/ixojxt69suzeb7vqcr3d2/125.-A-Dios-Demos-Gloria.mp3?rlkey=c6m1k9np7okfcw9r3o9zxlesd&st=umrbpfgf&dl=0",
                 references: [
 
@@ -1502,7 +1502,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/3e57opq1iacb9969zz6dh/126-Sabes-Que-Jes-s-Muri-letra.pdf?rlkey=enttpc41inv32mp1gsowl90ko&st=xgixp4b2&dl=0",
                 src: "https://www.dropbox.com/scl/fi/nhoyfqkm2gblqu1s0c9rr/126.-Sabes-que-muri-Jes-s.mp3?rlkey=3bq0tdbt3s4t36o8cmzjvouzz&st=dcne1em9&dl=0",
                 references: [
 
@@ -1514,7 +1514,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/zh4rhnvg8mmwq9294e8jr/127-Estamos-De-Fiesta-Con-Jes-s-letra.pdf?rlkey=hhwxn1ru3ynxp2m0kv1s07oeu&st=obhah1ne&dl=0",
                 src: "https://www.dropbox.com/scl/fi/yjm8rrmbbf0w5m0qrrd6o/127.-Estamos-De-Fiesta-Con-Jes-s.mp3?rlkey=a7qtrixlsvdspfiw0g13pnvyk&st=zijrq414&dl=0",
                 references: [
 
@@ -1526,7 +1526,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/ih3c6ipatfc8kootma9bu/288-Quiero-Cantar-16_9-V2.pdf?rlkey=hsswhxpwez8y0u908dnscidng&st=dfsn5q2t&dl=0",
                 src: "https://www.dropbox.com/scl/fi/4toxjod8kgz55ytlis7mx/128.-Quiero-Cantar-Una-Linda-Canci-n.mp3?rlkey=naqn6dl3ifwhawaneb3h3j2us&st=8cauxwby&dl=0",
                 references: [
 
@@ -1538,7 +1538,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/xc6uh4dz2jhu0iuzc73qi/164-Sublime-Gracia-16_9.pdf?rlkey=ikfwns402x39l5tp8ojcfvlrk&st=g2fcfv5c&dl=0",
                 src: "https://www.dropbox.com/scl/fi/hv0s9qqbhd6rgqbawcssy/129.-Sublime-Gracia.mp3?rlkey=9i86hvsf41qzgyvqpch3llvt5&st=lu1spxi3&dl=0",
                 references: [
 
@@ -1550,7 +1550,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/x8c8jwvi33f0uraj5jhxn/017-En-Momentos-As.pdf?rlkey=upwl35osvujpo07yy8lb7izf6&st=i74jmr5b&dl=0",
                 src: "https://www.dropbox.com/scl/fi/4ogmcecrlvl7ujbao2zw9/130.-En-Momentos-As.mp3?rlkey=3hwhwibilvcxv2cm9wkr4t5fb&st=1rl5we12&dl=0",
                 references: [
 
@@ -1562,7 +1562,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/jicfdo0mdvgtbd75p48w4/131-Unid-Los-Cantos-letra.pdf?rlkey=c52bplqd80m6g5ke9lmt523gj&st=chm0nrmt&dl=0",
                 src: "https://www.dropbox.com/scl/fi/s5wu4sad2yz30tq9s4334/131.-Unid-Los-Cantos.mp3?rlkey=1p1xk63kmxyj7inmpproso4hv&st=hisg4qg8&dl=0",
                 references: [
 
@@ -1574,7 +1574,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/c887d4r9hy5rzn1q0bfae/El-Mismo-Amor-HG.pdf?rlkey=ejdbd0zi8ixt3h76f07wx6yqf&st=j6o5rhet&dl=0",
                 src: "https://www.dropbox.com/scl/fi/wtd3dqwkoiua3x7nilsvd/132.-El-Mismo-Amor-Hacia-Todos.mp3?rlkey=omek166xgp7mtdzlurlqjeoo4&st=b3l00t1e&dl=0",
                 references: [
 
@@ -1586,7 +1586,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/71xy03c9evtva0fu5gnxy/Yo-no-quiero-Pecar.pdf?rlkey=olrnfze26d05zjgsaekxtxnzi&st=xery15rr&dl=0",
                 src: "https://www.dropbox.com/scl/fi/hf6ehdtgzvxp0v9q4qmf2/133.-Yo-No-Quiero-Pecar.mp3?rlkey=1ru8auniuo0mhamgoz1brezrh&st=55jwznv1&dl=0",
                 references: [
 
@@ -1598,7 +1598,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/cf9n01ypjjazqd8k9bi64/134-Demos-Loores-Al-Se-or-letra.pdf?rlkey=m46l66u3i9ssgmqiimmrkazcz&st=qjc3fk3e&dl=0",
                 src: "https://www.dropbox.com/scl/fi/5c60y8i68n1j38xnz0ht7/134.-Demos-loores-al-Se-or-Canta-Alabanzas-Al-Se-or.mp3?rlkey=3dm1l1is3vdvn1jq1stmshkim&st=d5o0eqfk&dl=0",
                 references: [
 
@@ -1606,11 +1606,11 @@
                 ] // {hymnal: "himnario ...", number: "00"} Array vacío si no hay referencias
             },
             {
-                title: "135 - Fue Enjuiciado Cristo",
+                title: "135 - Me Entregaré A Cristo ",
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/guzh8yu3zc14qbzydtsgx/135-Me-Entregare-A-Cristo-letra.pdf?rlkey=hnaf2fui3kplhf8opbvf5ghnn&st=9p0f08fq&dl=0",
                 src: "https://www.dropbox.com/scl/fi/f9u9i39xywo0wy50td6x6/135.-Fue-Enjuiciado-Cristo.mp3?rlkey=cm7duy3kwjkuiwm3fr3p8v8km&st=j13t3z3y&dl=0",
                 references: [
 
@@ -1622,7 +1622,7 @@
                 artist: "Himnario Cristiano",
                 temas: [],
 				// ¡NUEVO!: Añade aquí el enlace a tu imagen o tu PDF. 
-        		partitura: "",
+        		partitura: "https://www.dropbox.com/scl/fi/80s34zhhbjc0gb9mrn8yv/018-Seas-Exaltado.pdf?rlkey=c5tc1c05movvfw224bi2r7fsz&st=tev0norv&dl=0",
                 src: "https://www.dropbox.com/scl/fi/2kw9axz7tqwwl9p8no3mz/136.-Seas-Exaltado.mp3?rlkey=vq5zopyfu0ncla22xnlsedt4i&st=8amnroei&dl=0",
                 references: [
 
