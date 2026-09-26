@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restableciendo aplicación...</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', sans-serif;
+        }
+        body {
+            background-color: #121212;
+            color: #fff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left-color: #f7d694;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 {
+            color: #f7d694;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #b3b3b3;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="spinner"></div>
+    <h2>Restableciendo datos</h2>
+    <p>Borrando cookies, almacenamiento local y caché de la aplicación...</p>
+
+    <script>
+        function clearAllDataAndRedirect() {
+            // 1. Limpiar LocalStorage (Aquí están tus favoritos y descargas guardadas)
+            localStorage.clear();
+
+            // 2. Limpiar SessionStorage
+            sessionStorage.clear();
+
+            // 3. Limpiar todas las Cookies
+            const cookies = document.cookie.split("; ");
+            for (let c = 0; c < cookies.length; c++) {
+                const d = window.location.hostname.split(".");
+                while (d.length > 0) {
+                    const cookieBase = encodeURIComponent(cookies[c].split(";")[0].split("=")[0]) + '=; expires=Thu, 01-Jan-1970 00:00:01 GMT; domain=' + d.join('.') + ' ;path=';
+                    const p = location.pathname.split('/');
+                    document.cookie = cookieBase + '/';
+                    while (p.length > 0) {
+                        document.cookie = cookieBase + p.join('/');
+                        p.pop();
+                    }
+                    d.shift();
+                }
+            }
+
+            // 4. Desregistrar Service Workers (Elimina la caché de la PWA)
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                }).catch(function(err) {
+                    console.log('Error al desregistrar Service Worker:', err);
+                });
+            }
+
+            // 5. Borrar la caché específica del navegador (Cache Storage API)
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+
+            // Redirigir a la página principal después de 2 segundos para que el usuario vea el mensaje
+            setTimeout(() => {
+                // Sube un nivel desde la carpeta /clearcookies/ hacia la raíz del sitio
+                window.location.href = "../"; 
+            }, 2000);
+        }
+
+        // Ejecutar la función inmediatamente al cargar la página
+        window.onload = clearAllDataAndRedirect;
+    </script>
+</body>
+</html>
